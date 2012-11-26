@@ -3,10 +3,10 @@
   "name": "vektor",
   "description": "A linear algebra module, including vectors, matrices, transformations, etc",
   "keywords": "vector, matrix, transformation",
-  "version": "0.0.0",
-  "main":"lib/vektor.js",
+  "version": "0.0.1",
+  "main":"./index.js",
   "scripts": {
-    "test": "mocha tests/*.js"
+    "test": "mocha tests/*.js -R spec"
   },
   "repository": {
     "type": "git",
