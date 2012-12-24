@@ -5,6 +5,12 @@ var should = require('should');
 describe('Creating matrices: ', function () {
   it('should create a Matrix', function (done) {
     var A = new Matrix(3,4);
+    A.size.should.eql({rows: 3, cols: 4});
+    done();
+  });
+  it('should create a square Matrix', function (done) {
+    var B = new Matrix(2);
+    A.size.should.eql({rows: 2, cols: 2});
     done();
   });
 
