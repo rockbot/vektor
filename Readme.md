@@ -17,7 +17,10 @@ A robotics-focused linear algebra module
 * dot (multiply)
 * transpose
 
-## Coming Soon!
-### Transformations
+## Homogenous Matrices
 * Rotations
 * Translations
+
+## Coming Soon
+* Examples
+* Tutorials :-)
