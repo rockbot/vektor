@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  .slider.slider-1
+    h3 Slider 1
+      span.slider1-val 0
+    input#slider1(type='range', value='0', min='0', max='170')
+  .slider.slider-2
+    h3 Slider 2
+      span.slider2-val 0
+    input#slider2(type='range', value='0', min='0', max='170')
+
+append scripts
+  script
+    (function () {
+      var socket = io.connect('http://localhost');
+
+
+      $.domReady(function () {
+        $('#slider1').change(function () {
+          var value = $(this).val();
+          socket.emit('slider1', value);
+          $('.slider1-val').html(value);
+        })
+        $('#slider2').change(function () {
+          var value = $(this).val();
+          socket.emit('slider2', value);
+          $('.slider2-val').html(value);
+        })
+      });      
+
+    })();
