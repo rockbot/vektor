@@ -29,4 +29,10 @@ describe('Create a homogenous matrix', function () {
     H2_1.m.should.eql([[0, -s2_2, s2_2, 1], [1, 0, 0, 0], [0, s2_2, s2_2, 0], [0, 0, 0, 1]]);
     done();
   });
+  it('get the location of the transformed point', function (done) {
+    var Rz = new Rotate.RotZ(Math.PI/2);
+    var H1 = new Homog(Rz, new Vector([1, 0, 0]));
+    H1.getPoint().v.should.eql([1,0,0]);
+    done();
+  });
 });
