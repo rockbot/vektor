@@ -20,6 +20,6 @@ exports.index = function(req, res){
 	ctx.stroke();
 
 	// console.log('<img src="' + canvas.toDataURL() + '" />');
-	// res.render('index', { canvas: canvas.toDataURL() });
-	res.render('sliders');
+	res.render('sliders', { canvas: canvas.toDataURL() });
+	// res.render('sliders');
 };

@@ -20,17 +20,22 @@
     }
   }
 
-  socket.on('init', function (joints) { return drawLinks(joints); });
-  socket.on('draw', function (joints) { return drawLinks(joints); });
-
-  // function drawPoint(pt) {
+  // function drawPoint(joints) {
   //   ctx.clearRect(0,0,400,400);
 
-  //   ctx.fillStyle = "#000";
-  //   ctx.beginPath();
-  //   ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2, 0);
-  //   ctx.fill();
+  //   for (var j=0; j < joints.length; ++j) {
+  //     var pt = joints[j];
+  //     console.log(pt)
+  //     ctx.fillStyle = "#000";
+  //     ctx.beginPath();
+  //     ctx.arc(pt.x, pt.y, 5, 0, Math.PI * 2, 0);
+  //     ctx.fill();
+
+  //   }
   // }
+
+  socket.on('init', function (joints) { return drawLinks(joints); });
+  socket.on('draw', function (joints) { return drawLinks(joints); });
 
   getMouseClick = function (ev) {
     var offset = $('canvas').offset();
