@@ -58,4 +58,12 @@ describe('Between two vectors: ', function () {
     c.should.eql(1);
     done();
   });
+
+  it('should calculate the length of the vector', function (done) {
+    var lenA = a.length();
+    var lenB = b.length();
+    lenA.should.eql(1);
+    lenB.should.eql(Math.sqrt(2));
+    done();
+  })
 });
