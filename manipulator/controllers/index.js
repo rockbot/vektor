@@ -5,7 +5,7 @@
 
 exports.index = function(req, res){
 	var Canvas = require('canvas')
-	, canvas = new Canvas(200,200)
+	, canvas = new Canvas(500,300)
 	, ctx = canvas.getContext('2d');
 
 	ctx.font = '30px Impact';

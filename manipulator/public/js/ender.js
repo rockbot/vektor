@@ -1,7 +1,7 @@
 /*!
   * =============================================================
   * Ender: open module JavaScript framework (https://ender.no.de)
-  * Build: ender build jeesh
+  * Build: ender build bean bonzo domready qwery jeesh underscore
   * =============================================================
   */
 
@@ -129,16 +129,1257 @@
 
   var module = { exports: {} }, exports = module.exports;
 
+  //     Underscore.js 1.4.4
+  //     http://underscorejs.org
+  //     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud Inc.
+  //     Underscore may be freely distributed under the MIT license.
+  
+  (function() {
+  
+    // Baseline setup
+    // --------------
+  
+    // Establish the root object, `window` in the browser, or `global` on the server.
+    var root = this;
+  
+    // Save the previous value of the `_` variable.
+    var previousUnderscore = root._;
+  
+    // Establish the object that gets returned to break out of a loop iteration.
+    var breaker = {};
+  
+    // Save bytes in the minified (but not gzipped) version:
+    var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
+  
+    // Create quick reference variables for speed access to core prototypes.
+    var push             = ArrayProto.push,
+        slice            = ArrayProto.slice,
+        concat           = ArrayProto.concat,
+        toString         = ObjProto.toString,
+        hasOwnProperty   = ObjProto.hasOwnProperty;
+  
+    // All **ECMAScript 5** native function implementations that we hope to use
+    // are declared here.
+    var
+      nativeForEach      = ArrayProto.forEach,
+      nativeMap          = ArrayProto.map,
+      nativeReduce       = ArrayProto.reduce,
+      nativeReduceRight  = ArrayProto.reduceRight,
+      nativeFilter       = ArrayProto.filter,
+      nativeEvery        = ArrayProto.every,
+      nativeSome         = ArrayProto.some,
+      nativeIndexOf      = ArrayProto.indexOf,
+      nativeLastIndexOf  = ArrayProto.lastIndexOf,
+      nativeIsArray      = Array.isArray,
+      nativeKeys         = Object.keys,
+      nativeBind         = FuncProto.bind;
+  
+    // Create a safe reference to the Underscore object for use below.
+    var _ = function(obj) {
+      if (obj instanceof _) return obj;
+      if (!(this instanceof _)) return new _(obj);
+      this._wrapped = obj;
+    };
+  
+    // Export the Underscore object for **Node.js**, with
+    // backwards-compatibility for the old `require()` API. If we're in
+    // the browser, add `_` as a global object via a string identifier,
+    // for Closure Compiler "advanced" mode.
+    if (typeof exports !== 'undefined') {
+      if (typeof module !== 'undefined' && module.exports) {
+        exports = module.exports = _;
+      }
+      exports._ = _;
+    } else {
+      root._ = _;
+    }
+  
+    // Current version.
+    _.VERSION = '1.4.4';
+  
+    // Collection Functions
+    // --------------------
+  
+    // The cornerstone, an `each` implementation, aka `forEach`.
+    // Handles objects with the built-in `forEach`, arrays, and raw objects.
+    // Delegates to **ECMAScript 5**'s native `forEach` if available.
+    var each = _.each = _.forEach = function(obj, iterator, context) {
+      if (obj == null) return;
+      if (nativeForEach && obj.forEach === nativeForEach) {
+        obj.forEach(iterator, context);
+      } else if (obj.length === +obj.length) {
+        for (var i = 0, l = obj.length; i < l; i++) {
+          if (iterator.call(context, obj[i], i, obj) === breaker) return;
+        }
+      } else {
+        for (var key in obj) {
+          if (_.has(obj, key)) {
+            if (iterator.call(context, obj[key], key, obj) === breaker) return;
+          }
+        }
+      }
+    };
+  
+    // Return the results of applying the iterator to each element.
+    // Delegates to **ECMAScript 5**'s native `map` if available.
+    _.map = _.collect = function(obj, iterator, context) {
+      var results = [];
+      if (obj == null) return results;
+      if (nativeMap && obj.map === nativeMap) return obj.map(iterator, context);
+      each(obj, function(value, index, list) {
+        results[results.length] = iterator.call(context, value, index, list);
+      });
+      return results;
+    };
+  
+    var reduceError = 'Reduce of empty array with no initial value';
+  
+    // **Reduce** builds up a single result from a list of values, aka `inject`,
+    // or `foldl`. Delegates to **ECMAScript 5**'s native `reduce` if available.
+    _.reduce = _.foldl = _.inject = function(obj, iterator, memo, context) {
+      var initial = arguments.length > 2;
+      if (obj == null) obj = [];
+      if (nativeReduce && obj.reduce === nativeReduce) {
+        if (context) iterator = _.bind(iterator, context);
+        return initial ? obj.reduce(iterator, memo) : obj.reduce(iterator);
+      }
+      each(obj, function(value, index, list) {
+        if (!initial) {
+          memo = value;
+          initial = true;
+        } else {
+          memo = iterator.call(context, memo, value, index, list);
+        }
+      });
+      if (!initial) throw new TypeError(reduceError);
+      return memo;
+    };
+  
+    // The right-associative version of reduce, also known as `foldr`.
+    // Delegates to **ECMAScript 5**'s native `reduceRight` if available.
+    _.reduceRight = _.foldr = function(obj, iterator, memo, context) {
+      var initial = arguments.length > 2;
+      if (obj == null) obj = [];
+      if (nativeReduceRight && obj.reduceRight === nativeReduceRight) {
+        if (context) iterator = _.bind(iterator, context);
+        return initial ? obj.reduceRight(iterator, memo) : obj.reduceRight(iterator);
+      }
+      var length = obj.length;
+      if (length !== +length) {
+        var keys = _.keys(obj);
+        length = keys.length;
+      }
+      each(obj, function(value, index, list) {
+        index = keys ? keys[--length] : --length;
+        if (!initial) {
+          memo = obj[index];
+          initial = true;
+        } else {
+          memo = iterator.call(context, memo, obj[index], index, list);
+        }
+      });
+      if (!initial) throw new TypeError(reduceError);
+      return memo;
+    };
+  
+    // Return the first value which passes a truth test. Aliased as `detect`.
+    _.find = _.detect = function(obj, iterator, context) {
+      var result;
+      any(obj, function(value, index, list) {
+        if (iterator.call(context, value, index, list)) {
+          result = value;
+          return true;
+        }
+      });
+      return result;
+    };
+  
+    // Return all the elements that pass a truth test.
+    // Delegates to **ECMAScript 5**'s native `filter` if available.
+    // Aliased as `select`.
+    _.filter = _.select = function(obj, iterator, context) {
+      var results = [];
+      if (obj == null) return results;
+      if (nativeFilter && obj.filter === nativeFilter) return obj.filter(iterator, context);
+      each(obj, function(value, index, list) {
+        if (iterator.call(context, value, index, list)) results[results.length] = value;
+      });
+      return results;
+    };
+  
+    // Return all the elements for which a truth test fails.
+    _.reject = function(obj, iterator, context) {
+      return _.filter(obj, function(value, index, list) {
+        return !iterator.call(context, value, index, list);
+      }, context);
+    };
+  
+    // Determine whether all of the elements match a truth test.
+    // Delegates to **ECMAScript 5**'s native `every` if available.
+    // Aliased as `all`.
+    _.every = _.all = function(obj, iterator, context) {
+      iterator || (iterator = _.identity);
+      var result = true;
+      if (obj == null) return result;
+      if (nativeEvery && obj.every === nativeEvery) return obj.every(iterator, context);
+      each(obj, function(value, index, list) {
+        if (!(result = result && iterator.call(context, value, index, list))) return breaker;
+      });
+      return !!result;
+    };
+  
+    // Determine if at least one element in the object matches a truth test.
+    // Delegates to **ECMAScript 5**'s native `some` if available.
+    // Aliased as `any`.
+    var any = _.some = _.any = function(obj, iterator, context) {
+      iterator || (iterator = _.identity);
+      var result = false;
+      if (obj == null) return result;
+      if (nativeSome && obj.some === nativeSome) return obj.some(iterator, context);
+      each(obj, function(value, index, list) {
+        if (result || (result = iterator.call(context, value, index, list))) return breaker;
+      });
+      return !!result;
+    };
+  
+    // Determine if the array or object contains a given value (using `===`).
+    // Aliased as `include`.
+    _.contains = _.include = function(obj, target) {
+      if (obj == null) return false;
+      if (nativeIndexOf && obj.indexOf === nativeIndexOf) return obj.indexOf(target) != -1;
+      return any(obj, function(value) {
+        return value === target;
+      });
+    };
+  
+    // Invoke a method (with arguments) on every item in a collection.
+    _.invoke = function(obj, method) {
+      var args = slice.call(arguments, 2);
+      var isFunc = _.isFunction(method);
+      return _.map(obj, function(value) {
+        return (isFunc ? method : value[method]).apply(value, args);
+      });
+    };
+  
+    // Convenience version of a common use case of `map`: fetching a property.
+    _.pluck = function(obj, key) {
+      return _.map(obj, function(value){ return value[key]; });
+    };
+  
+    // Convenience version of a common use case of `filter`: selecting only objects
+    // containing specific `key:value` pairs.
+    _.where = function(obj, attrs, first) {
+      if (_.isEmpty(attrs)) return first ? null : [];
+      return _[first ? 'find' : 'filter'](obj, function(value) {
+        for (var key in attrs) {
+          if (attrs[key] !== value[key]) return false;
+        }
+        return true;
+      });
+    };
+  
+    // Convenience version of a common use case of `find`: getting the first object
+    // containing specific `key:value` pairs.
+    _.findWhere = function(obj, attrs) {
+      return _.where(obj, attrs, true);
+    };
+  
+    // Return the maximum element or (element-based computation).
+    // Can't optimize arrays of integers longer than 65,535 elements.
+    // See: https://bugs.webkit.org/show_bug.cgi?id=80797
+    _.max = function(obj, iterator, context) {
+      if (!iterator && _.isArray(obj) && obj[0] === +obj[0] && obj.length < 65535) {
+        return Math.max.apply(Math, obj);
+      }
+      if (!iterator && _.isEmpty(obj)) return -Infinity;
+      var result = {computed : -Infinity, value: -Infinity};
+      each(obj, function(value, index, list) {
+        var computed = iterator ? iterator.call(context, value, index, list) : value;
+        computed >= result.computed && (result = {value : value, computed : computed});
+      });
+      return result.value;
+    };
+  
+    // Return the minimum element (or element-based computation).
+    _.min = function(obj, iterator, context) {
+      if (!iterator && _.isArray(obj) && obj[0] === +obj[0] && obj.length < 65535) {
+        return Math.min.apply(Math, obj);
+      }
+      if (!iterator && _.isEmpty(obj)) return Infinity;
+      var result = {computed : Infinity, value: Infinity};
+      each(obj, function(value, index, list) {
+        var computed = iterator ? iterator.call(context, value, index, list) : value;
+        computed < result.computed && (result = {value : value, computed : computed});
+      });
+      return result.value;
+    };
+  
+    // Shuffle an array.
+    _.shuffle = function(obj) {
+      var rand;
+      var index = 0;
+      var shuffled = [];
+      each(obj, function(value) {
+        rand = _.random(index++);
+        shuffled[index - 1] = shuffled[rand];
+        shuffled[rand] = value;
+      });
+      return shuffled;
+    };
+  
+    // An internal function to generate lookup iterators.
+    var lookupIterator = function(value) {
+      return _.isFunction(value) ? value : function(obj){ return obj[value]; };
+    };
+  
+    // Sort the object's values by a criterion produced by an iterator.
+    _.sortBy = function(obj, value, context) {
+      var iterator = lookupIterator(value);
+      return _.pluck(_.map(obj, function(value, index, list) {
+        return {
+          value : value,
+          index : index,
+          criteria : iterator.call(context, value, index, list)
+        };
+      }).sort(function(left, right) {
+        var a = left.criteria;
+        var b = right.criteria;
+        if (a !== b) {
+          if (a > b || a === void 0) return 1;
+          if (a < b || b === void 0) return -1;
+        }
+        return left.index < right.index ? -1 : 1;
+      }), 'value');
+    };
+  
+    // An internal function used for aggregate "group by" operations.
+    var group = function(obj, value, context, behavior) {
+      var result = {};
+      var iterator = lookupIterator(value || _.identity);
+      each(obj, function(value, index) {
+        var key = iterator.call(context, value, index, obj);
+        behavior(result, key, value);
+      });
+      return result;
+    };
+  
+    // Groups the object's values by a criterion. Pass either a string attribute
+    // to group by, or a function that returns the criterion.
+    _.groupBy = function(obj, value, context) {
+      return group(obj, value, context, function(result, key, value) {
+        (_.has(result, key) ? result[key] : (result[key] = [])).push(value);
+      });
+    };
+  
+    // Counts instances of an object that group by a certain criterion. Pass
+    // either a string attribute to count by, or a function that returns the
+    // criterion.
+    _.countBy = function(obj, value, context) {
+      return group(obj, value, context, function(result, key) {
+        if (!_.has(result, key)) result[key] = 0;
+        result[key]++;
+      });
+    };
+  
+    // Use a comparator function to figure out the smallest index at which
+    // an object should be inserted so as to maintain order. Uses binary search.
+    _.sortedIndex = function(array, obj, iterator, context) {
+      iterator = iterator == null ? _.identity : lookupIterator(iterator);
+      var value = iterator.call(context, obj);
+      var low = 0, high = array.length;
+      while (low < high) {
+        var mid = (low + high) >>> 1;
+        iterator.call(context, array[mid]) < value ? low = mid + 1 : high = mid;
+      }
+      return low;
+    };
+  
+    // Safely convert anything iterable into a real, live array.
+    _.toArray = function(obj) {
+      if (!obj) return [];
+      if (_.isArray(obj)) return slice.call(obj);
+      if (obj.length === +obj.length) return _.map(obj, _.identity);
+      return _.values(obj);
+    };
+  
+    // Return the number of elements in an object.
+    _.size = function(obj) {
+      if (obj == null) return 0;
+      return (obj.length === +obj.length) ? obj.length : _.keys(obj).length;
+    };
+  
+    // Array Functions
+    // ---------------
+  
+    // Get the first element of an array. Passing **n** will return the first N
+    // values in the array. Aliased as `head` and `take`. The **guard** check
+    // allows it to work with `_.map`.
+    _.first = _.head = _.take = function(array, n, guard) {
+      if (array == null) return void 0;
+      return (n != null) && !guard ? slice.call(array, 0, n) : array[0];
+    };
+  
+    // Returns everything but the last entry of the array. Especially useful on
+    // the arguments object. Passing **n** will return all the values in
+    // the array, excluding the last N. The **guard** check allows it to work with
+    // `_.map`.
+    _.initial = function(array, n, guard) {
+      return slice.call(array, 0, array.length - ((n == null) || guard ? 1 : n));
+    };
+  
+    // Get the last element of an array. Passing **n** will return the last N
+    // values in the array. The **guard** check allows it to work with `_.map`.
+    _.last = function(array, n, guard) {
+      if (array == null) return void 0;
+      if ((n != null) && !guard) {
+        return slice.call(array, Math.max(array.length - n, 0));
+      } else {
+        return array[array.length - 1];
+      }
+    };
+  
+    // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
+    // Especially useful on the arguments object. Passing an **n** will return
+    // the rest N values in the array. The **guard**
+    // check allows it to work with `_.map`.
+    _.rest = _.tail = _.drop = function(array, n, guard) {
+      return slice.call(array, (n == null) || guard ? 1 : n);
+    };
+  
+    // Trim out all falsy values from an array.
+    _.compact = function(array) {
+      return _.filter(array, _.identity);
+    };
+  
+    // Internal implementation of a recursive `flatten` function.
+    var flatten = function(input, shallow, output) {
+      each(input, function(value) {
+        if (_.isArray(value)) {
+          shallow ? push.apply(output, value) : flatten(value, shallow, output);
+        } else {
+          output.push(value);
+        }
+      });
+      return output;
+    };
+  
+    // Return a completely flattened version of an array.
+    _.flatten = function(array, shallow) {
+      return flatten(array, shallow, []);
+    };
+  
+    // Return a version of the array that does not contain the specified value(s).
+    _.without = function(array) {
+      return _.difference(array, slice.call(arguments, 1));
+    };
+  
+    // Produce a duplicate-free version of the array. If the array has already
+    // been sorted, you have the option of using a faster algorithm.
+    // Aliased as `unique`.
+    _.uniq = _.unique = function(array, isSorted, iterator, context) {
+      if (_.isFunction(isSorted)) {
+        context = iterator;
+        iterator = isSorted;
+        isSorted = false;
+      }
+      var initial = iterator ? _.map(array, iterator, context) : array;
+      var results = [];
+      var seen = [];
+      each(initial, function(value, index) {
+        if (isSorted ? (!index || seen[seen.length - 1] !== value) : !_.contains(seen, value)) {
+          seen.push(value);
+          results.push(array[index]);
+        }
+      });
+      return results;
+    };
+  
+    // Produce an array that contains the union: each distinct element from all of
+    // the passed-in arrays.
+    _.union = function() {
+      return _.uniq(concat.apply(ArrayProto, arguments));
+    };
+  
+    // Produce an array that contains every item shared between all the
+    // passed-in arrays.
+    _.intersection = function(array) {
+      var rest = slice.call(arguments, 1);
+      return _.filter(_.uniq(array), function(item) {
+        return _.every(rest, function(other) {
+          return _.indexOf(other, item) >= 0;
+        });
+      });
+    };
+  
+    // Take the difference between one array and a number of other arrays.
+    // Only the elements present in just the first array will remain.
+    _.difference = function(array) {
+      var rest = concat.apply(ArrayProto, slice.call(arguments, 1));
+      return _.filter(array, function(value){ return !_.contains(rest, value); });
+    };
+  
+    // Zip together multiple lists into a single array -- elements that share
+    // an index go together.
+    _.zip = function() {
+      var args = slice.call(arguments);
+      var length = _.max(_.pluck(args, 'length'));
+      var results = new Array(length);
+      for (var i = 0; i < length; i++) {
+        results[i] = _.pluck(args, "" + i);
+      }
+      return results;
+    };
+  
+    // Converts lists into objects. Pass either a single array of `[key, value]`
+    // pairs, or two parallel arrays of the same length -- one of keys, and one of
+    // the corresponding values.
+    _.object = function(list, values) {
+      if (list == null) return {};
+      var result = {};
+      for (var i = 0, l = list.length; i < l; i++) {
+        if (values) {
+          result[list[i]] = values[i];
+        } else {
+          result[list[i][0]] = list[i][1];
+        }
+      }
+      return result;
+    };
+  
+    // If the browser doesn't supply us with indexOf (I'm looking at you, **MSIE**),
+    // we need this function. Return the position of the first occurrence of an
+    // item in an array, or -1 if the item is not included in the array.
+    // Delegates to **ECMAScript 5**'s native `indexOf` if available.
+    // If the array is large and already in sort order, pass `true`
+    // for **isSorted** to use binary search.
+    _.indexOf = function(array, item, isSorted) {
+      if (array == null) return -1;
+      var i = 0, l = array.length;
+      if (isSorted) {
+        if (typeof isSorted == 'number') {
+          i = (isSorted < 0 ? Math.max(0, l + isSorted) : isSorted);
+        } else {
+          i = _.sortedIndex(array, item);
+          return array[i] === item ? i : -1;
+        }
+      }
+      if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item, isSorted);
+      for (; i < l; i++) if (array[i] === item) return i;
+      return -1;
+    };
+  
+    // Delegates to **ECMAScript 5**'s native `lastIndexOf` if available.
+    _.lastIndexOf = function(array, item, from) {
+      if (array == null) return -1;
+      var hasIndex = from != null;
+      if (nativeLastIndexOf && array.lastIndexOf === nativeLastIndexOf) {
+        return hasIndex ? array.lastIndexOf(item, from) : array.lastIndexOf(item);
+      }
+      var i = (hasIndex ? from : array.length);
+      while (i--) if (array[i] === item) return i;
+      return -1;
+    };
+  
+    // Generate an integer Array containing an arithmetic progression. A port of
+    // the native Python `range()` function. See
+    // [the Python documentation](http://docs.python.org/library/functions.html#range).
+    _.range = function(start, stop, step) {
+      if (arguments.length <= 1) {
+        stop = start || 0;
+        start = 0;
+      }
+      step = arguments[2] || 1;
+  
+      var len = Math.max(Math.ceil((stop - start) / step), 0);
+      var idx = 0;
+      var range = new Array(len);
+  
+      while(idx < len) {
+        range[idx++] = start;
+        start += step;
+      }
+  
+      return range;
+    };
+  
+    // Function (ahem) Functions
+    // ------------------
+  
+    // Create a function bound to a given object (assigning `this`, and arguments,
+    // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
+    // available.
+    _.bind = function(func, context) {
+      if (func.bind === nativeBind && nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
+      var args = slice.call(arguments, 2);
+      return function() {
+        return func.apply(context, args.concat(slice.call(arguments)));
+      };
+    };
+  
+    // Partially apply a function by creating a version that has had some of its
+    // arguments pre-filled, without changing its dynamic `this` context.
+    _.partial = function(func) {
+      var args = slice.call(arguments, 1);
+      return function() {
+        return func.apply(this, args.concat(slice.call(arguments)));
+      };
+    };
+  
+    // Bind all of an object's methods to that object. Useful for ensuring that
+    // all callbacks defined on an object belong to it.
+    _.bindAll = function(obj) {
+      var funcs = slice.call(arguments, 1);
+      if (funcs.length === 0) funcs = _.functions(obj);
+      each(funcs, function(f) { obj[f] = _.bind(obj[f], obj); });
+      return obj;
+    };
+  
+    // Memoize an expensive function by storing its results.
+    _.memoize = function(func, hasher) {
+      var memo = {};
+      hasher || (hasher = _.identity);
+      return function() {
+        var key = hasher.apply(this, arguments);
+        return _.has(memo, key) ? memo[key] : (memo[key] = func.apply(this, arguments));
+      };
+    };
+  
+    // Delays a function for the given number of milliseconds, and then calls
+    // it with the arguments supplied.
+    _.delay = function(func, wait) {
+      var args = slice.call(arguments, 2);
+      return setTimeout(function(){ return func.apply(null, args); }, wait);
+    };
+  
+    // Defers a function, scheduling it to run after the current call stack has
+    // cleared.
+    _.defer = function(func) {
+      return _.delay.apply(_, [func, 1].concat(slice.call(arguments, 1)));
+    };
+  
+    // Returns a function, that, when invoked, will only be triggered at most once
+    // during a given window of time.
+    _.throttle = function(func, wait) {
+      var context, args, timeout, result;
+      var previous = 0;
+      var later = function() {
+        previous = new Date;
+        timeout = null;
+        result = func.apply(context, args);
+      };
+      return function() {
+        var now = new Date;
+        var remaining = wait - (now - previous);
+        context = this;
+        args = arguments;
+        if (remaining <= 0) {
+          clearTimeout(timeout);
+          timeout = null;
+          previous = now;
+          result = func.apply(context, args);
+        } else if (!timeout) {
+          timeout = setTimeout(later, remaining);
+        }
+        return result;
+      };
+    };
+  
+    // Returns a function, that, as long as it continues to be invoked, will not
+    // be triggered. The function will be called after it stops being called for
+    // N milliseconds. If `immediate` is passed, trigger the function on the
+    // leading edge, instead of the trailing.
+    _.debounce = function(func, wait, immediate) {
+      var timeout, result;
+      return function() {
+        var context = this, args = arguments;
+        var later = function() {
+          timeout = null;
+          if (!immediate) result = func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) result = func.apply(context, args);
+        return result;
+      };
+    };
+  
+    // Returns a function that will be executed at most one time, no matter how
+    // often you call it. Useful for lazy initialization.
+    _.once = function(func) {
+      var ran = false, memo;
+      return function() {
+        if (ran) return memo;
+        ran = true;
+        memo = func.apply(this, arguments);
+        func = null;
+        return memo;
+      };
+    };
+  
+    // Returns the first function passed as an argument to the second,
+    // allowing you to adjust arguments, run code before and after, and
+    // conditionally execute the original function.
+    _.wrap = function(func, wrapper) {
+      return function() {
+        var args = [func];
+        push.apply(args, arguments);
+        return wrapper.apply(this, args);
+      };
+    };
+  
+    // Returns a function that is the composition of a list of functions, each
+    // consuming the return value of the function that follows.
+    _.compose = function() {
+      var funcs = arguments;
+      return function() {
+        var args = arguments;
+        for (var i = funcs.length - 1; i >= 0; i--) {
+          args = [funcs[i].apply(this, args)];
+        }
+        return args[0];
+      };
+    };
+  
+    // Returns a function that will only be executed after being called N times.
+    _.after = function(times, func) {
+      if (times <= 0) return func();
+      return function() {
+        if (--times < 1) {
+          return func.apply(this, arguments);
+        }
+      };
+    };
+  
+    // Object Functions
+    // ----------------
+  
+    // Retrieve the names of an object's properties.
+    // Delegates to **ECMAScript 5**'s native `Object.keys`
+    _.keys = nativeKeys || function(obj) {
+      if (obj !== Object(obj)) throw new TypeError('Invalid object');
+      var keys = [];
+      for (var key in obj) if (_.has(obj, key)) keys[keys.length] = key;
+      return keys;
+    };
+  
+    // Retrieve the values of an object's properties.
+    _.values = function(obj) {
+      var values = [];
+      for (var key in obj) if (_.has(obj, key)) values.push(obj[key]);
+      return values;
+    };
+  
+    // Convert an object into a list of `[key, value]` pairs.
+    _.pairs = function(obj) {
+      var pairs = [];
+      for (var key in obj) if (_.has(obj, key)) pairs.push([key, obj[key]]);
+      return pairs;
+    };
+  
+    // Invert the keys and values of an object. The values must be serializable.
+    _.invert = function(obj) {
+      var result = {};
+      for (var key in obj) if (_.has(obj, key)) result[obj[key]] = key;
+      return result;
+    };
+  
+    // Return a sorted list of the function names available on the object.
+    // Aliased as `methods`
+    _.functions = _.methods = function(obj) {
+      var names = [];
+      for (var key in obj) {
+        if (_.isFunction(obj[key])) names.push(key);
+      }
+      return names.sort();
+    };
+  
+    // Extend a given object with all the properties in passed-in object(s).
+    _.extend = function(obj) {
+      each(slice.call(arguments, 1), function(source) {
+        if (source) {
+          for (var prop in source) {
+            obj[prop] = source[prop];
+          }
+        }
+      });
+      return obj;
+    };
+  
+    // Return a copy of the object only containing the whitelisted properties.
+    _.pick = function(obj) {
+      var copy = {};
+      var keys = concat.apply(ArrayProto, slice.call(arguments, 1));
+      each(keys, function(key) {
+        if (key in obj) copy[key] = obj[key];
+      });
+      return copy;
+    };
+  
+     // Return a copy of the object without the blacklisted properties.
+    _.omit = function(obj) {
+      var copy = {};
+      var keys = concat.apply(ArrayProto, slice.call(arguments, 1));
+      for (var key in obj) {
+        if (!_.contains(keys, key)) copy[key] = obj[key];
+      }
+      return copy;
+    };
+  
+    // Fill in a given object with default properties.
+    _.defaults = function(obj) {
+      each(slice.call(arguments, 1), function(source) {
+        if (source) {
+          for (var prop in source) {
+            if (obj[prop] == null) obj[prop] = source[prop];
+          }
+        }
+      });
+      return obj;
+    };
+  
+    // Create a (shallow-cloned) duplicate of an object.
+    _.clone = function(obj) {
+      if (!_.isObject(obj)) return obj;
+      return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
+    };
+  
+    // Invokes interceptor with the obj, and then returns obj.
+    // The primary purpose of this method is to "tap into" a method chain, in
+    // order to perform operations on intermediate results within the chain.
+    _.tap = function(obj, interceptor) {
+      interceptor(obj);
+      return obj;
+    };
+  
+    // Internal recursive comparison function for `isEqual`.
+    var eq = function(a, b, aStack, bStack) {
+      // Identical objects are equal. `0 === -0`, but they aren't identical.
+      // See the Harmony `egal` proposal: http://wiki.ecmascript.org/doku.php?id=harmony:egal.
+      if (a === b) return a !== 0 || 1 / a == 1 / b;
+      // A strict comparison is necessary because `null == undefined`.
+      if (a == null || b == null) return a === b;
+      // Unwrap any wrapped objects.
+      if (a instanceof _) a = a._wrapped;
+      if (b instanceof _) b = b._wrapped;
+      // Compare `[[Class]]` names.
+      var className = toString.call(a);
+      if (className != toString.call(b)) return false;
+      switch (className) {
+        // Strings, numbers, dates, and booleans are compared by value.
+        case '[object String]':
+          // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
+          // equivalent to `new String("5")`.
+          return a == String(b);
+        case '[object Number]':
+          // `NaN`s are equivalent, but non-reflexive. An `egal` comparison is performed for
+          // other numeric values.
+          return a != +a ? b != +b : (a == 0 ? 1 / a == 1 / b : a == +b);
+        case '[object Date]':
+        case '[object Boolean]':
+          // Coerce dates and booleans to numeric primitive values. Dates are compared by their
+          // millisecond representations. Note that invalid dates with millisecond representations
+          // of `NaN` are not equivalent.
+          return +a == +b;
+        // RegExps are compared by their source patterns and flags.
+        case '[object RegExp]':
+          return a.source == b.source &&
+                 a.global == b.global &&
+                 a.multiline == b.multiline &&
+                 a.ignoreCase == b.ignoreCase;
+      }
+      if (typeof a != 'object' || typeof b != 'object') return false;
+      // Assume equality for cyclic structures. The algorithm for detecting cyclic
+      // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
+      var length = aStack.length;
+      while (length--) {
+        // Linear search. Performance is inversely proportional to the number of
+        // unique nested structures.
+        if (aStack[length] == a) return bStack[length] == b;
+      }
+      // Add the first object to the stack of traversed objects.
+      aStack.push(a);
+      bStack.push(b);
+      var size = 0, result = true;
+      // Recursively compare objects and arrays.
+      if (className == '[object Array]') {
+        // Compare array lengths to determine if a deep comparison is necessary.
+        size = a.length;
+        result = size == b.length;
+        if (result) {
+          // Deep compare the contents, ignoring non-numeric properties.
+          while (size--) {
+            if (!(result = eq(a[size], b[size], aStack, bStack))) break;
+          }
+        }
+      } else {
+        // Objects with different constructors are not equivalent, but `Object`s
+        // from different frames are.
+        var aCtor = a.constructor, bCtor = b.constructor;
+        if (aCtor !== bCtor && !(_.isFunction(aCtor) && (aCtor instanceof aCtor) &&
+                                 _.isFunction(bCtor) && (bCtor instanceof bCtor))) {
+          return false;
+        }
+        // Deep compare objects.
+        for (var key in a) {
+          if (_.has(a, key)) {
+            // Count the expected number of properties.
+            size++;
+            // Deep compare each member.
+            if (!(result = _.has(b, key) && eq(a[key], b[key], aStack, bStack))) break;
+          }
+        }
+        // Ensure that both objects contain the same number of properties.
+        if (result) {
+          for (key in b) {
+            if (_.has(b, key) && !(size--)) break;
+          }
+          result = !size;
+        }
+      }
+      // Remove the first object from the stack of traversed objects.
+      aStack.pop();
+      bStack.pop();
+      return result;
+    };
+  
+    // Perform a deep comparison to check if two objects are equal.
+    _.isEqual = function(a, b) {
+      return eq(a, b, [], []);
+    };
+  
+    // Is a given array, string, or object empty?
+    // An "empty" object has no enumerable own-properties.
+    _.isEmpty = function(obj) {
+      if (obj == null) return true;
+      if (_.isArray(obj) || _.isString(obj)) return obj.length === 0;
+      for (var key in obj) if (_.has(obj, key)) return false;
+      return true;
+    };
+  
+    // Is a given value a DOM element?
+    _.isElement = function(obj) {
+      return !!(obj && obj.nodeType === 1);
+    };
+  
+    // Is a given value an array?
+    // Delegates to ECMA5's native Array.isArray
+    _.isArray = nativeIsArray || function(obj) {
+      return toString.call(obj) == '[object Array]';
+    };
+  
+    // Is a given variable an object?
+    _.isObject = function(obj) {
+      return obj === Object(obj);
+    };
+  
+    // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
+    each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'], function(name) {
+      _['is' + name] = function(obj) {
+        return toString.call(obj) == '[object ' + name + ']';
+      };
+    });
+  
+    // Define a fallback version of the method in browsers (ahem, IE), where
+    // there isn't any inspectable "Arguments" type.
+    if (!_.isArguments(arguments)) {
+      _.isArguments = function(obj) {
+        return !!(obj && _.has(obj, 'callee'));
+      };
+    }
+  
+    // Optimize `isFunction` if appropriate.
+    if (typeof (/./) !== 'function') {
+      _.isFunction = function(obj) {
+        return typeof obj === 'function';
+      };
+    }
+  
+    // Is a given object a finite number?
+    _.isFinite = function(obj) {
+      return isFinite(obj) && !isNaN(parseFloat(obj));
+    };
+  
+    // Is the given value `NaN`? (NaN is the only number which does not equal itself).
+    _.isNaN = function(obj) {
+      return _.isNumber(obj) && obj != +obj;
+    };
+  
+    // Is a given value a boolean?
+    _.isBoolean = function(obj) {
+      return obj === true || obj === false || toString.call(obj) == '[object Boolean]';
+    };
+  
+    // Is a given value equal to null?
+    _.isNull = function(obj) {
+      return obj === null;
+    };
+  
+    // Is a given variable undefined?
+    _.isUndefined = function(obj) {
+      return obj === void 0;
+    };
+  
+    // Shortcut function for checking if an object has a given property directly
+    // on itself (in other words, not on a prototype).
+    _.has = function(obj, key) {
+      return hasOwnProperty.call(obj, key);
+    };
+  
+    // Utility Functions
+    // -----------------
+  
+    // Run Underscore.js in *noConflict* mode, returning the `_` variable to its
+    // previous owner. Returns a reference to the Underscore object.
+    _.noConflict = function() {
+      root._ = previousUnderscore;
+      return this;
+    };
+  
+    // Keep the identity function around for default iterators.
+    _.identity = function(value) {
+      return value;
+    };
+  
+    // Run a function **n** times.
+    _.times = function(n, iterator, context) {
+      var accum = Array(n);
+      for (var i = 0; i < n; i++) accum[i] = iterator.call(context, i);
+      return accum;
+    };
+  
+    // Return a random integer between min and max (inclusive).
+    _.random = function(min, max) {
+      if (max == null) {
+        max = min;
+        min = 0;
+      }
+      return min + Math.floor(Math.random() * (max - min + 1));
+    };
+  
+    // List of HTML entities for escaping.
+    var entityMap = {
+      escape: {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '/': '&#x2F;'
+      }
+    };
+    entityMap.unescape = _.invert(entityMap.escape);
+  
+    // Regexes containing the keys and values listed immediately above.
+    var entityRegexes = {
+      escape:   new RegExp('[' + _.keys(entityMap.escape).join('') + ']', 'g'),
+      unescape: new RegExp('(' + _.keys(entityMap.unescape).join('|') + ')', 'g')
+    };
+  
+    // Functions for escaping and unescaping strings to/from HTML interpolation.
+    _.each(['escape', 'unescape'], function(method) {
+      _[method] = function(string) {
+        if (string == null) return '';
+        return ('' + string).replace(entityRegexes[method], function(match) {
+          return entityMap[method][match];
+        });
+      };
+    });
+  
+    // If the value of the named property is a function then invoke it;
+    // otherwise, return it.
+    _.result = function(object, property) {
+      if (object == null) return null;
+      var value = object[property];
+      return _.isFunction(value) ? value.call(object) : value;
+    };
+  
+    // Add your own custom functions to the Underscore object.
+    _.mixin = function(obj) {
+      each(_.functions(obj), function(name){
+        var func = _[name] = obj[name];
+        _.prototype[name] = function() {
+          var args = [this._wrapped];
+          push.apply(args, arguments);
+          return result.call(this, func.apply(_, args));
+        };
+      });
+    };
+  
+    // Generate a unique integer id (unique within the entire client session).
+    // Useful for temporary DOM ids.
+    var idCounter = 0;
+    _.uniqueId = function(prefix) {
+      var id = ++idCounter + '';
+      return prefix ? prefix + id : id;
+    };
+  
+    // By default, Underscore uses ERB-style template delimiters, change the
+    // following template settings to use alternative delimiters.
+    _.templateSettings = {
+      evaluate    : /<%([\s\S]+?)%>/g,
+      interpolate : /<%=([\s\S]+?)%>/g,
+      escape      : /<%-([\s\S]+?)%>/g
+    };
+  
+    // When customizing `templateSettings`, if you don't want to define an
+    // interpolation, evaluation or escaping regex, we need one that is
+    // guaranteed not to match.
+    var noMatch = /(.)^/;
+  
+    // Certain characters need to be escaped so that they can be put into a
+    // string literal.
+    var escapes = {
+      "'":      "'",
+      '\\':     '\\',
+      '\r':     'r',
+      '\n':     'n',
+      '\t':     't',
+      '\u2028': 'u2028',
+      '\u2029': 'u2029'
+    };
+  
+    var escaper = /\\|'|\r|\n|\t|\u2028|\u2029/g;
+  
+    // JavaScript micro-templating, similar to John Resig's implementation.
+    // Underscore templating handles arbitrary delimiters, preserves whitespace,
+    // and correctly escapes quotes within interpolated code.
+    _.template = function(text, data, settings) {
+      var render;
+      settings = _.defaults({}, settings, _.templateSettings);
+  
+      // Combine delimiters into one regular expression via alternation.
+      var matcher = new RegExp([
+        (settings.escape || noMatch).source,
+        (settings.interpolate || noMatch).source,
+        (settings.evaluate || noMatch).source
+      ].join('|') + '|$', 'g');
+  
+      // Compile the template source, escaping string literals appropriately.
+      var index = 0;
+      var source = "__p+='";
+      text.replace(matcher, function(match, escape, interpolate, evaluate, offset) {
+        source += text.slice(index, offset)
+          .replace(escaper, function(match) { return '\\' + escapes[match]; });
+  
+        if (escape) {
+          source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
+        }
+        if (interpolate) {
+          source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
+        }
+        if (evaluate) {
+          source += "';\n" + evaluate + "\n__p+='";
+        }
+        index = offset + match.length;
+        return match;
+      });
+      source += "';\n";
+  
+      // If a variable is not specified, place data values in local scope.
+      if (!settings.variable) source = 'with(obj||{}){\n' + source + '}\n';
+  
+      source = "var __t,__p='',__j=Array.prototype.join," +
+        "print=function(){__p+=__j.call(arguments,'');};\n" +
+        source + "return __p;\n";
+  
+      try {
+        render = new Function(settings.variable || 'obj', '_', source);
+      } catch (e) {
+        e.source = source;
+        throw e;
+      }
+  
+      if (data) return render(data, _);
+      var template = function(data) {
+        return render.call(this, data, _);
+      };
+  
+      // Provide the compiled function source as a convenience for precompilation.
+      template.source = 'function(' + (settings.variable || 'obj') + '){\n' + source + '}';
+  
+      return template;
+    };
+  
+    // Add a "chain" function, which will delegate to the wrapper.
+    _.chain = function(obj) {
+      return _(obj).chain();
+    };
+  
+    // OOP
+    // ---------------
+    // If Underscore is called as a function, it returns a wrapped object that
+    // can be used OO-style. This wrapper holds altered versions of all the
+    // underscore functions. Wrapped objects may be chained.
+  
+    // Helper function to continue chaining intermediate results.
+    var result = function(obj) {
+      return this._chain ? _(obj).chain() : obj;
+    };
+  
+    // Add all of the Underscore functions to the wrapper object.
+    _.mixin(_);
+  
+    // Add all mutator Array functions to the wrapper.
+    each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
+      var method = ArrayProto[name];
+      _.prototype[name] = function() {
+        var obj = this._wrapped;
+        method.apply(obj, arguments);
+        if ((name == 'shift' || name == 'splice') && obj.length === 0) delete obj[0];
+        return result.call(this, obj);
+      };
+    });
+  
+    // Add all accessor Array functions to the wrapper.
+    each(['concat', 'join', 'slice'], function(name) {
+      var method = ArrayProto[name];
+      _.prototype[name] = function() {
+        return result.call(this, method.apply(this._wrapped, arguments));
+      };
+    });
+  
+    _.extend(_.prototype, {
+  
+      // Start chaining a wrapped Underscore object.
+      chain: function() {
+        this._chain = true;
+        return this;
+      },
+  
+      // Extracts the result from a wrapped and chained object.
+      value: function() {
+        return this._wrapped;
+      }
+  
+    });
+  
+  }).call(this);
+  
+
+  provide("underscore", module.exports);
+
+  $.ender(module.exports);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
   /*!
     * Bean - copyright (c) Jacob Thornton 2011-2012
     * https://github.com/fat/bean
     * MIT license
     */
-  !(function (name, context, definition) {
-    if (typeof module != 'undefined' && module.exports) module.exports = definition(name, context);
-    else if (typeof define == 'function' && typeof define.amd  == 'object') define(definition);
-    else context[name] = definition(name, context);
-  }('bean', this, function (name, context) {
+  (function (name, context, definition) {
+    if (typeof module != 'undefined' && module.exports) module.exports = definition()
+    else if (typeof define == 'function' && define.amd) define(definition)
+    else context[name] = definition()
+  })('bean', this, function (name, context) {
+    name    = name    || 'bean'
+    context = context || this
+  
     var win            = window
       , old            = context[name]
       , namespaceRegex = /[^\.]*(?=\..*)\.|.*/
@@ -687,7 +1928,7 @@
           }
   
           type = isTypeStr && typeSpec.replace(nameRegex, '')
-          if (type && customEvents[type]) type = customEvents[type].type
+          if (type && customEvents[type]) type = customEvents[type].base
   
           if (!typeSpec || isTypeStr) {
             // off(el) or off(el, t1.ns) or off(el, .ns) or off(el, .ns1.ns2.ns3)
@@ -865,8 +2106,7 @@
     setSelectorEngine()
   
     return bean
-  }));
-  
+  });
 
   provide("bean", module.exports);
 
@@ -943,537 +2183,23 @@
   var module = { exports: {} }, exports = module.exports;
 
   /*!
-    * domready (c) Dustin Diaz 2012 - License MIT
-    */
-  !function (name, definition) {
-    if (typeof module != 'undefined') module.exports = definition()
-    else if (typeof define == 'function' && typeof define.amd == 'object') define(definition)
-    else this[name] = definition()
-  }('domready', function (ready) {
-  
-    var fns = [], fn, f = false
-      , doc = document
-      , testEl = doc.documentElement
-      , hack = testEl.doScroll
-      , domContentLoaded = 'DOMContentLoaded'
-      , addEventListener = 'addEventListener'
-      , onreadystatechange = 'onreadystatechange'
-      , readyState = 'readyState'
-      , loaded = /^loade|c/.test(doc[readyState])
-  
-    function flush(f) {
-      loaded = 1
-      while (f = fns.shift()) f()
-    }
-  
-    doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function () {
-      doc.removeEventListener(domContentLoaded, fn, f)
-      flush()
-    }, f)
-  
-  
-    hack && doc.attachEvent(onreadystatechange, fn = function () {
-      if (/^c/.test(doc[readyState])) {
-        doc.detachEvent(onreadystatechange, fn)
-        flush()
-      }
-    })
-  
-    return (ready = hack ?
-      function (fn) {
-        self != top ?
-          loaded ? fn() : fns.push(fn) :
-          function () {
-            try {
-              testEl.doScroll('left')
-            } catch (e) {
-              return setTimeout(function() { ready(fn) }, 50)
-            }
-            fn()
-          }()
-      } :
-      function (fn) {
-        loaded ? fn() : fns.push(fn)
-      })
-  })
-
-  provide("domready", module.exports);
-
-  !function ($) {
-    var ready = require('domready')
-    $.ender({domReady: ready})
-    $.ender({
-      ready: function (f) {
-        ready(f)
-        return this
-      }
-    }, true)
-  }(ender);
-
-}());
-
-(function () {
-
-  var module = { exports: {} }, exports = module.exports;
-
-  /*!
-    * @preserve Qwery - A Blazing Fast query selector engine
-    * https://github.com/ded/qwery
-    * copyright Dustin Diaz & Jacob Thornton 2012
-    * MIT License
-    */
-  
-  (function (name, definition, context) {
-    if (typeof module != 'undefined' && module.exports) module.exports = definition()
-    else if (typeof context['define'] == 'function' && context['define']['amd']) define(name, definition)
-    else context[name] = definition()
-  })('qwery', function () {
-    var doc = document
-      , html = doc.documentElement
-      , byClass = 'getElementsByClassName'
-      , byTag = 'getElementsByTagName'
-      , qSA = 'querySelectorAll'
-      , useNativeQSA = 'useNativeQSA'
-      , tagName = 'tagName'
-      , nodeType = 'nodeType'
-      , select // main select() method, assign later
-  
-      , id = /#([\w\-]+)/
-      , clas = /\.[\w\-]+/g
-      , idOnly = /^#([\w\-]+)$/
-      , classOnly = /^\.([\w\-]+)$/
-      , tagOnly = /^([\w\-]+)$/
-      , tagAndOrClass = /^([\w]+)?\.([\w\-]+)$/
-      , splittable = /(^|,)\s*[>~+]/
-      , normalizr = /^\s+|\s*([,\s\+\~>]|$)\s*/g
-      , splitters = /[\s\>\+\~]/
-      , splittersMore = /(?![\s\w\-\/\?\&\=\:\.\(\)\!,@#%<>\{\}\$\*\^'"]*\]|[\s\w\+\-]*\))/
-      , specialChars = /([.*+?\^=!:${}()|\[\]\/\\])/g
-      , simple = /^(\*|[a-z0-9]+)?(?:([\.\#]+[\w\-\.#]+)?)/
-      , attr = /\[([\w\-]+)(?:([\|\^\$\*\~]?\=)['"]?([ \w\-\/\?\&\=\:\.\(\)\!,@#%<>\{\}\$\*\^]+)["']?)?\]/
-      , pseudo = /:([\w\-]+)(\(['"]?([^()]+)['"]?\))?/
-      , easy = new RegExp(idOnly.source + '|' + tagOnly.source + '|' + classOnly.source)
-      , dividers = new RegExp('(' + splitters.source + ')' + splittersMore.source, 'g')
-      , tokenizr = new RegExp(splitters.source + splittersMore.source)
-      , chunker = new RegExp(simple.source + '(' + attr.source + ')?' + '(' + pseudo.source + ')?')
-      , walker = {
-          ' ': function (node) {
-            return node && node !== html && node.parentNode
-          }
-        , '>': function (node, contestant) {
-            return node && node.parentNode == contestant.parentNode && node.parentNode
-          }
-        , '~': function (node) {
-            return node && node.previousSibling
-          }
-        , '+': function (node, contestant, p1, p2) {
-            if (!node) return false
-            return (p1 = previous(node)) && (p2 = previous(contestant)) && p1 == p2 && p1
-          }
-        }
-  
-    function cache() {
-      this.c = {}
-    }
-    cache.prototype = {
-      g: function (k) {
-        return this.c[k] || undefined
-      }
-    , s: function (k, v, r) {
-        v = r ? new RegExp(v) : v
-        return (this.c[k] = v)
-      }
-    }
-  
-    var classCache = new cache()
-      , cleanCache = new cache()
-      , attrCache = new cache()
-      , tokenCache = new cache()
-  
-    function classRegex(c) {
-      return classCache.g(c) || classCache.s(c, '(^|\\s+)' + c + '(\\s+|$)', 1)
-    }
-  
-    // not quite as fast as inline loops in older browsers so don't use liberally
-    function each(a, fn) {
-      var i = 0, l = a.length
-      for (; i < l; i++) fn(a[i])
-    }
-  
-    function flatten(ar) {
-      for (var r = [], i = 0, l = ar.length; i < l; ++i) arrayLike(ar[i]) ? (r = r.concat(ar[i])) : (r[r.length] = ar[i])
-      return r
-    }
-  
-    function arrayify(ar) {
-      var i = 0, l = ar.length, r = []
-      for (; i < l; i++) r[i] = ar[i]
-      return r
-    }
-  
-    function previous(n) {
-      while (n = n.previousSibling) if (n[nodeType] == 1) break;
-      return n
-    }
-  
-    function q(query) {
-      return query.match(chunker)
-    }
-  
-    // called using `this` as element and arguments from regex group results.
-    // given => div.hello[title="world"]:foo('bar')
-    // div.hello[title="world"]:foo('bar'), div, .hello, [title="world"], title, =, world, :foo('bar'), foo, ('bar'), bar]
-    function interpret(whole, tag, idsAndClasses, wholeAttribute, attribute, qualifier, value, wholePseudo, pseudo, wholePseudoVal, pseudoVal) {
-      var i, m, k, o, classes
-      if (this[nodeType] !== 1) return false
-      if (tag && tag !== '*' && this[tagName] && this[tagName].toLowerCase() !== tag) return false
-      if (idsAndClasses && (m = idsAndClasses.match(id)) && m[1] !== this.id) return false
-      if (idsAndClasses && (classes = idsAndClasses.match(clas))) {
-        for (i = classes.length; i--;) if (!classRegex(classes[i].slice(1)).test(this.className)) return false
-      }
-      if (pseudo && qwery.pseudos[pseudo] && !qwery.pseudos[pseudo](this, pseudoVal)) return false
-      if (wholeAttribute && !value) { // select is just for existance of attrib
-        o = this.attributes
-        for (k in o) {
-          if (Object.prototype.hasOwnProperty.call(o, k) && (o[k].name || k) == attribute) {
-            return this
-          }
-        }
-      }
-      if (wholeAttribute && !checkAttr(qualifier, getAttr(this, attribute) || '', value)) {
-        // select is for attrib equality
-        return false
-      }
-      return this
-    }
-  
-    function clean(s) {
-      return cleanCache.g(s) || cleanCache.s(s, s.replace(specialChars, '\\$1'))
-    }
-  
-    function checkAttr(qualify, actual, val) {
-      switch (qualify) {
-      case '=':
-        return actual == val
-      case '^=':
-        return actual.match(attrCache.g('^=' + val) || attrCache.s('^=' + val, '^' + clean(val), 1))
-      case '$=':
-        return actual.match(attrCache.g('$=' + val) || attrCache.s('$=' + val, clean(val) + '$', 1))
-      case '*=':
-        return actual.match(attrCache.g(val) || attrCache.s(val, clean(val), 1))
-      case '~=':
-        return actual.match(attrCache.g('~=' + val) || attrCache.s('~=' + val, '(?:^|\\s+)' + clean(val) + '(?:\\s+|$)', 1))
-      case '|=':
-        return actual.match(attrCache.g('|=' + val) || attrCache.s('|=' + val, '^' + clean(val) + '(-|$)', 1))
-      }
-      return 0
-    }
-  
-    // given a selector, first check for simple cases then collect all base candidate matches and filter
-    function _qwery(selector, _root) {
-      var r = [], ret = [], i, l, m, token, tag, els, intr, item, root = _root
-        , tokens = tokenCache.g(selector) || tokenCache.s(selector, selector.split(tokenizr))
-        , dividedTokens = selector.match(dividers)
-  
-      if (!tokens.length) return r
-  
-      token = (tokens = tokens.slice(0)).pop() // copy cached tokens, take the last one
-      if (tokens.length && (m = tokens[tokens.length - 1].match(idOnly))) root = byId(_root, m[1])
-      if (!root) return r
-  
-      intr = q(token)
-      // collect base candidates to filter
-      els = root !== _root && root[nodeType] !== 9 && dividedTokens && /^[+~]$/.test(dividedTokens[dividedTokens.length - 1]) ?
-        function (r) {
-          while (root = root.nextSibling) {
-            root[nodeType] == 1 && (intr[1] ? intr[1] == root[tagName].toLowerCase() : 1) && (r[r.length] = root)
-          }
-          return r
-        }([]) :
-        root[byTag](intr[1] || '*')
-      // filter elements according to the right-most part of the selector
-      for (i = 0, l = els.length; i < l; i++) {
-        if (item = interpret.apply(els[i], intr)) r[r.length] = item
-      }
-      if (!tokens.length) return r
-  
-      // filter further according to the rest of the selector (the left side)
-      each(r, function(e) { if (ancestorMatch(e, tokens, dividedTokens)) ret[ret.length] = e })
-      return ret
-    }
-  
-    // compare element to a selector
-    function is(el, selector, root) {
-      if (isNode(selector)) return el == selector
-      if (arrayLike(selector)) return !!~flatten(selector).indexOf(el) // if selector is an array, is el a member?
-  
-      var selectors = selector.split(','), tokens, dividedTokens
-      while (selector = selectors.pop()) {
-        tokens = tokenCache.g(selector) || tokenCache.s(selector, selector.split(tokenizr))
-        dividedTokens = selector.match(dividers)
-        tokens = tokens.slice(0) // copy array
-        if (interpret.apply(el, q(tokens.pop())) && (!tokens.length || ancestorMatch(el, tokens, dividedTokens, root))) {
-          return true
-        }
-      }
-      return false
-    }
-  
-    // given elements matching the right-most part of a selector, filter out any that don't match the rest
-    function ancestorMatch(el, tokens, dividedTokens, root) {
-      var cand
-      // recursively work backwards through the tokens and up the dom, covering all options
-      function crawl(e, i, p) {
-        while (p = walker[dividedTokens[i]](p, e)) {
-          if (isNode(p) && (interpret.apply(p, q(tokens[i])))) {
-            if (i) {
-              if (cand = crawl(p, i - 1, p)) return cand
-            } else return p
-          }
-        }
-      }
-      return (cand = crawl(el, tokens.length - 1, el)) && (!root || isAncestor(cand, root))
-    }
-  
-    function isNode(el, t) {
-      return el && typeof el === 'object' && (t = el[nodeType]) && (t == 1 || t == 9)
-    }
-  
-    function uniq(ar) {
-      var a = [], i, j
-      o: for (i = 0; i < ar.length; ++i) {
-        for (j = 0; j < a.length; ++j) if (a[j] == ar[i]) continue o
-        a[a.length] = ar[i]
-      }
-      return a
-    }
-  
-    function arrayLike(o) {
-      return (typeof o === 'object' && isFinite(o.length))
-    }
-  
-    function normalizeRoot(root) {
-      if (!root) return doc
-      if (typeof root == 'string') return qwery(root)[0]
-      if (!root[nodeType] && arrayLike(root)) return root[0]
-      return root
-    }
-  
-    function byId(root, id, el) {
-      // if doc, query on it, else query the parent doc or if a detached fragment rewrite the query and run on the fragment
-      return root[nodeType] === 9 ? root.getElementById(id) :
-        root.ownerDocument &&
-          (((el = root.ownerDocument.getElementById(id)) && isAncestor(el, root) && el) ||
-            (!isAncestor(root, root.ownerDocument) && select('[id="' + id + '"]', root)[0]))
-    }
-  
-    function qwery(selector, _root) {
-      var m, el, root = normalizeRoot(_root)
-  
-      // easy, fast cases that we can dispatch with simple DOM calls
-      if (!root || !selector) return []
-      if (selector === window || isNode(selector)) {
-        return !_root || (selector !== window && isNode(root) && isAncestor(selector, root)) ? [selector] : []
-      }
-      if (selector && arrayLike(selector)) return flatten(selector)
-      if (m = selector.match(easy)) {
-        if (m[1]) return (el = byId(root, m[1])) ? [el] : []
-        if (m[2]) return arrayify(root[byTag](m[2]))
-        if (hasByClass && m[3]) return arrayify(root[byClass](m[3]))
-      }
-  
-      return select(selector, root)
-    }
-  
-    // where the root is not document and a relationship selector is first we have to
-    // do some awkward adjustments to get it to work, even with qSA
-    function collectSelector(root, collector) {
-      return function(s) {
-        var oid, nid
-        if (splittable.test(s)) {
-          if (root[nodeType] !== 9) {
-           // make sure the el has an id, rewrite the query, set root to doc and run it
-           if (!(nid = oid = root.getAttribute('id'))) root.setAttribute('id', nid = '__qwerymeupscotty')
-           s = '[id="' + nid + '"]' + s // avoid byId and allow us to match context element
-           collector(root.parentNode || root, s, true)
-           oid || root.removeAttribute('id')
-          }
-          return;
-        }
-        s.length && collector(root, s, false)
-      }
-    }
-  
-    var isAncestor = 'compareDocumentPosition' in html ?
-      function (element, container) {
-        return (container.compareDocumentPosition(element) & 16) == 16
-      } : 'contains' in html ?
-      function (element, container) {
-        container = container[nodeType] === 9 || container == window ? html : container
-        return container !== element && container.contains(element)
-      } :
-      function (element, container) {
-        while (element = element.parentNode) if (element === container) return 1
-        return 0
-      }
-    , getAttr = function() {
-        // detect buggy IE src/href getAttribute() call
-        var e = doc.createElement('p')
-        return ((e.innerHTML = '<a href="#x">x</a>') && e.firstChild.getAttribute('href') != '#x') ?
-          function(e, a) {
-            return a === 'class' ? e.className : (a === 'href' || a === 'src') ?
-              e.getAttribute(a, 2) : e.getAttribute(a)
-          } :
-          function(e, a) { return e.getAttribute(a) }
-     }()
-    , hasByClass = !!doc[byClass]
-      // has native qSA support
-    , hasQSA = doc.querySelector && doc[qSA]
-      // use native qSA
-    , selectQSA = function (selector, root) {
-        var result = [], ss, e
-        try {
-          if (root[nodeType] === 9 || !splittable.test(selector)) {
-            // most work is done right here, defer to qSA
-            return arrayify(root[qSA](selector))
-          }
-          // special case where we need the services of `collectSelector()`
-          each(ss = selector.split(','), collectSelector(root, function(ctx, s) {
-            e = ctx[qSA](s)
-            if (e.length == 1) result[result.length] = e.item(0)
-            else if (e.length) result = result.concat(arrayify(e))
-          }))
-          return ss.length > 1 && result.length > 1 ? uniq(result) : result
-        } catch(ex) { }
-        return selectNonNative(selector, root)
-      }
-      // no native selector support
-    , selectNonNative = function (selector, root) {
-        var result = [], items, m, i, l, r, ss
-        selector = selector.replace(normalizr, '$1')
-        if (m = selector.match(tagAndOrClass)) {
-          r = classRegex(m[2])
-          items = root[byTag](m[1] || '*')
-          for (i = 0, l = items.length; i < l; i++) {
-            if (r.test(items[i].className)) result[result.length] = items[i]
-          }
-          return result
-        }
-        // more complex selector, get `_qwery()` to do the work for us
-        each(ss = selector.split(','), collectSelector(root, function(ctx, s, rewrite) {
-          r = _qwery(s, ctx)
-          for (i = 0, l = r.length; i < l; i++) {
-            if (ctx[nodeType] === 9 || rewrite || isAncestor(r[i], root)) result[result.length] = r[i]
-          }
-        }))
-        return ss.length > 1 && result.length > 1 ? uniq(result) : result
-      }
-    , configure = function (options) {
-        // configNativeQSA: use fully-internal selector or native qSA where present
-        if (typeof options[useNativeQSA] !== 'undefined')
-          select = !options[useNativeQSA] ? selectNonNative : hasQSA ? selectQSA : selectNonNative
-      }
-  
-    configure({ useNativeQSA: true })
-  
-    qwery.configure = configure
-    qwery.uniq = uniq
-    qwery.is = is
-    qwery.pseudos = {}
-  
-    return qwery
-  }, this);
-  
-
-  provide("qwery", module.exports);
-
-  (function ($) {
-    var q = function () {
-      var r
-      try {
-        r = require('qwery')
-      } catch (ex) {
-        r = require('qwery-mobile')
-      } finally {
-        return r
-      }
-    }()
-  
-    $.pseudos = q.pseudos
-  
-    $._select = function (s, r) {
-      // detect if sibling module 'bonzo' is available at run-time
-      // rather than load-time since technically it's not a dependency and
-      // can be loaded in any order
-      // hence the lazy function re-definition
-      return ($._select = (function () {
-        var b
-        if (typeof $.create == 'function') return function (s, r) {
-          return /^\s*</.test(s) ? $.create(s, r) : q(s, r)
-        }
-        try {
-          b = require('bonzo')
-          return function (s, r) {
-            return /^\s*</.test(s) ? b.create(s, r) : q(s, r)
-          }
-        } catch (e) { }
-        return q
-      })())(s, r)
-    }
-  
-    $.ender({
-        find: function (s) {
-          var r = [], i, l, j, k, els
-          for (i = 0, l = this.length; i < l; i++) {
-            els = q(s, this[i])
-            for (j = 0, k = els.length; j < k; j++) r.push(els[j])
-          }
-          return $(q.uniq(r))
-        }
-      , and: function (s) {
-          var plus = $(s)
-          for (var i = this.length, j = 0, l = this.length + plus.length; i < l; i++, j++) {
-            this[i] = plus[j]
-          }
-          this.length += plus.length
-          return this
-        }
-      , is: function(s, r) {
-          var i, l
-          for (i = 0, l = this.length; i < l; i++) {
-            if (q.is(this[i], s, r)) {
-              return true
-            }
-          }
-          return false
-        }
-    }, true)
-  }(ender));
-  
-
-}());
-
-(function () {
-
-  var module = { exports: {} }, exports = module.exports;
-
-  /*!
     * Bonzo: DOM Utility (c) Dustin Diaz 2012
     * https://github.com/ded/bonzo
     * License MIT
     */
-  (function (name, definition, context) {
+  (function (name, context, definition) {
     if (typeof module != 'undefined' && module.exports) module.exports = definition()
-    else if (typeof context['define'] == 'function' && context['define']['amd']) define(name, definition)
+    else if (typeof define == 'function' && define.amd) define(definition)
     else context[name] = definition()
-  })('bonzo', function() {
+  })('bonzo', this, function() {
     var win = window
       , doc = win.document
       , html = doc.documentElement
       , parentNode = 'parentNode'
-      , query = null // used for setting a selector engine host
       , specialAttributes = /^(checked|value|selected|disabled)$/i
-      , specialTags = /^(select|fieldset|table|tbody|tfoot|td|tr|colgroup)$/i // tags that we have trouble inserting *into*
+        // tags that we have trouble inserting *into*
+      , specialTags = /^(select|fieldset|table|tbody|tfoot|td|tr|colgroup)$/i
+      , simpleScriptTagRe = /\s*<script +src=['"]([^'"]+)['"]>/
       , table = ['<table>', '</table>', 1]
       , td = ['<table><tbody><tr>', '</tr></tbody></table>', 3]
       , option = ['<select>', '</select>', 1]
@@ -1523,6 +2249,7 @@
       , whitespaceRegex = /\s+/
       , toString = String.prototype.toString
       , unitless = { lineHeight: 1, zoom: 1, zIndex: 1, opacity: 1, boxFlex: 1, WebkitBoxFlex: 1, MozBoxFlex: 1 }
+      , query = doc.querySelectorAll && function (selector) { return doc.querySelectorAll(selector) }
       , trim = String.prototype.trim ?
           function (s) {
             return s.trim()
@@ -1531,13 +2258,63 @@
             return s.replace(trimReplace, '')
           }
   
+      , getStyle = features.computedStyle
+          ? function (el, property) {
+              var value = null
+                , computed = doc.defaultView.getComputedStyle(el, '')
+              computed && (value = computed[property])
+              return el.style[property] || value
+            }
+          : !(ie && html.currentStyle)
+            ? function (el, property) {
+                return el.style[property]
+              }
+            :
+            /**
+             * @param {Element} el
+             * @param {string} property
+             * @return {string|number}
+             */
+            function (el, property) {
+              var val, value
+              if (property == 'opacity' && !features.opasity) {
+                val = 100
+                try {
+                  val = el['filters']['DXImageTransform.Microsoft.Alpha'].opacity
+                } catch (e1) {
+                  try {
+                    val = el['filters']('alpha').opacity
+                  } catch (e2) {}
+                }
+                return val / 100
+              }
+              value = el.currentStyle ? el.currentStyle[property] : null
+              return el.style[property] || value
+            }
+  
+    function isNode(node) {
+      return node && node.nodeName && (node.nodeType == 1 || node.nodeType == 11)
+    }
+  
+  
+    function normalize(node, host, clone) {
+      var i, l, ret
+      if (typeof node == 'string') return bonzo.create(node)
+      if (isNode(node)) node = [ node ]
+      if (clone) {
+        ret = [] // don't change original array
+        for (i = 0, l = node.length; i < l; i++) ret[i] = cloneNode(host, node[i])
+        return ret
+      }
+      return node
+    }
   
     /**
      * @param {string} c a class name to test
      * @return {boolean}
      */
     function classReg(c) {
-      return new RegExp("(^|\\s+)" + c + "(\\s+|$)")
+      return new RegExp('(^|\\s+)' + c + '(\\s+|$)')
     }
   
   
@@ -1628,10 +2405,6 @@
       return undefined
     }
   
-    function isNode(node) {
-      return node && node.nodeName && (node.nodeType == 1 || node.nodeType == 11)
-    }
-  
   
     /**
      * @param {Bonzo|Array} ar
@@ -1659,41 +2432,6 @@
           (p == 'float' && (p = features.cssFloat))
         return p ? camelize(p) : null
     }
-  
-    var getStyle = features.computedStyle ?
-      function (el, property) {
-        var value = null
-          , computed = doc.defaultView.getComputedStyle(el, '')
-        computed && (value = computed[property])
-        return el.style[property] || value
-      } :
-  
-      (ie && html.currentStyle) ?
-  
-      /**
-       * @param {Element} el
-       * @param {string} property
-       * @return {string|number}
-       */
-      function (el, property) {
-        if (property == 'opacity' && !features.opasity) {
-          var val = 100
-          try {
-            val = el['filters']['DXImageTransform.Microsoft.Alpha'].opacity
-          } catch (e1) {
-            try {
-              val = el['filters']('alpha').opacity
-            } catch (e2) {}
-          }
-          return val / 100
-        }
-        var value = el.currentStyle ? el.currentStyle[property] : null
-        return el.style[property] || value
-      } :
-  
-      function (el, property) {
-        return el.style[property]
-      }
   
     // this insert method is intense
     function insert(target, host, fn, rev) {
@@ -1782,6 +2520,21 @@
      */
     function setter(el, v) {
       return typeof v == 'function' ? v(el) : v
+    }
+  
+    function scroll(x, y, type) {
+      var el = this[0]
+      if (!el) return this
+      if (x == null && y == null) {
+        return (isBody(el) ? getWindowScroll() : { x: el.scrollLeft, y: el.scrollTop })[type]
+      }
+      if (isBody(el)) {
+        win.scrollTo(x, y)
+      } else {
+        x != null && (el.scrollLeft = x)
+        y != null && (el.scrollTop = y)
+      }
+      return this
     }
   
     /**
@@ -2002,6 +2755,17 @@
           return this.remove()
         }
   
+        /**
+         * @param {Object=} opt_host an optional host scope (primarily used when integrated with Ender)
+         * @return {Bonzo}
+         */
+      , clone: function (opt_host) {
+          var ret = [] // don't change original array
+            , l, i
+          for (i = 0, l = this.length; i < l; i++) ret[i] = cloneNode(opt_host || this, this[i])
+          return bonzo(ret)
+        }
+  
         // class management
   
         /**
@@ -2060,7 +2824,7 @@
             each(c, function (c) {
               if (c) {
                 typeof opt_condition !== 'undefined' ?
-                  opt_condition ? addClass(el, c) : removeClass(el, c) :
+                  opt_condition ? !hasClass(el, c) && addClass(el, c) : removeClass(el, c) :
                   hasClass(el, c) ? removeClass(el, c) : addClass(el, c)
               }
             })
@@ -2154,7 +2918,7 @@
          * @return {Element|Node}
          */
       , related: function (method) {
-          return this.map(
+          return bonzo(this.map(
             function (el) {
               el = el[method]
               while (el && el.nodeType !== 1) {
@@ -2165,7 +2929,7 @@
             function (el) {
               return el
             }
-          )
+          ))
         }
   
   
@@ -2299,7 +3063,7 @@
                 ? Math.max(el.body.scrollWidth, el.body.offsetWidth, de.scrollWidth, de.offsetWidth, de.clientWidth)
                 : el.offsetWidth
             , height = de
-                ? Math.max(el.body.scrollHeight, el.body.offsetHeight, de.scrollWidth, de.offsetWidth, de.clientHeight)
+                ? Math.max(el.body.scrollHeight, el.body.offsetHeight, de.scrollHeight, de.offsetHeight, de.clientHeight)
                 : el.offsetHeight
   
           orig && this.first().css(orig)
@@ -2318,12 +3082,15 @@
          */
       , attr: function (k, opt_v) {
           var el = this[0]
+            , n
+  
           if (typeof k != 'string' && !(k instanceof String)) {
-            for (var n in k) {
+            for (n in k) {
               k.hasOwnProperty(n) && this.attr(n, k[n])
             }
             return this
           }
+  
           return typeof opt_v == 'undefined' ?
             !el ? null : specialAttributes.test(k) ?
               stateAttributes.test(k) && typeof el[k] == 'string' ?
@@ -2436,22 +3203,12 @@
   
     }
   
-    function normalize(node, host, clone) {
-      var i, l, ret
-      if (typeof node == 'string') return bonzo.create(node)
-      if (isNode(node)) node = [ node ]
-      if (clone) {
-        ret = [] // don't change original array
-        for (i = 0, l = node.length; i < l; i++) ret[i] = cloneNode(host, node[i])
-        return ret
-      }
-      return node
-    }
   
     function cloneNode(host, el) {
       var c = el.cloneNode(true)
         , cloneElems
         , elElems
+        , i
   
       // check for existence of an event cloner
       // preferably https://github.com/fat/bean
@@ -2463,25 +3220,10 @@
         cloneElems = host.$(c).find('*')
         elElems = host.$(el).find('*')
   
-        for (var i = 0; i < elElems.length; i++)
+        for (i = 0; i < elElems.length; i++)
           host.$(cloneElems[i]).cloneEvents(elElems[i])
       }
       return c
-    }
-  
-    function scroll(x, y, type) {
-      var el = this[0]
-      if (!el) return this
-      if (x == null && y == null) {
-        return (isBody(el) ? getWindowScroll() : { x: el.scrollLeft, y: el.scrollTop })[type]
-      }
-      if (isBody(el)) {
-        win.scrollTo(x, y)
-      } else {
-        x != null && (el.scrollLeft = x)
-        y != null && (el.scrollTop = y)
-      }
-      return this
     }
   
     function isBody(element) {
@@ -2490,6 +3232,13 @@
   
     function getWindowScroll() {
       return { x: win.pageXOffset || html.scrollLeft, y: win.pageYOffset || html.scrollTop }
+    }
+  
+    function createScriptFromHtml(html) {
+      var scriptEl = document.createElement('script')
+        , matches = html.match(simpleScriptTagRe)
+      scriptEl.src = matches[1]
+      return scriptEl
     }
   
     /**
@@ -2516,7 +3265,8 @@
       // hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
       return typeof node == 'string' && node !== '' ?
         function () {
-          var tag = /^\s*<([^\s>]+)/.exec(node)
+          if (simpleScriptTagRe.test(node)) return [createScriptFromHtml(node)]
+          var tag = node.match(/^\s*<([^\s>]+)/)
             , el = doc.createElement('div')
             , els = []
             , p = tag ? tagMap[tag[1].toLowerCase()] : null
@@ -2532,7 +3282,7 @@
           do {
             // tbody special case for IE<8, creates tbody on any empty table
             // we don't want it if we're just after a <thead>, <caption>, etc.
-            if ((!tag || el.nodeType == 1) && (!tb || el.tagName.toLowerCase() != 'tbody')) {
+            if ((!tag || el.nodeType == 1) && (!tb || (el.tagName && el.tagName != 'TBODY'))) {
               els.push(el)
             }
           } while (el = el.nextSibling)
@@ -2582,7 +3332,7 @@
       }
   
     return bonzo
-  }, this); // the only line we care about using a semi-colon. placed here for concatenation tools
+  }); // the only line we care about using a semi-colon. placed here for concatenation tools
   
 
   provide("bonzo", module.exports);
@@ -2663,6 +3413,10 @@
         return $(b(this).previous())
       }
   
+    , related: function (t) {
+        return $(b(this).related(t))
+      }
+  
     , appendTo: function (t) {
         return b(this.selector).appendTo(t, this)
       }
@@ -2677,6 +3431,10 @@
   
     , insertBefore: function (t) {
         return b(this.selector).insertBefore(t, this)
+      }
+  
+    , clone: function () {
+        return $(b(this).clone(this))
       }
   
     , siblings: function () {
@@ -2720,6 +3478,523 @@
         : this.css(type, opt_v)
     }
   }(ender));
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /*!
+    * domready (c) Dustin Diaz 2012 - License MIT
+    */
+  !function (name, definition) {
+    if (typeof module != 'undefined') module.exports = definition()
+    else if (typeof define == 'function' && typeof define.amd == 'object') define(definition)
+    else this[name] = definition()
+  }('domready', function (ready) {
+  
+    var fns = [], fn, f = false
+      , doc = document
+      , testEl = doc.documentElement
+      , hack = testEl.doScroll
+      , domContentLoaded = 'DOMContentLoaded'
+      , addEventListener = 'addEventListener'
+      , onreadystatechange = 'onreadystatechange'
+      , readyState = 'readyState'
+      , loaded = /^loade|c/.test(doc[readyState])
+  
+    function flush(f) {
+      loaded = 1
+      while (f = fns.shift()) f()
+    }
+  
+    doc[addEventListener] && doc[addEventListener](domContentLoaded, fn = function () {
+      doc.removeEventListener(domContentLoaded, fn, f)
+      flush()
+    }, f)
+  
+  
+    hack && doc.attachEvent(onreadystatechange, fn = function () {
+      if (/^c/.test(doc[readyState])) {
+        doc.detachEvent(onreadystatechange, fn)
+        flush()
+      }
+    })
+  
+    return (ready = hack ?
+      function (fn) {
+        self != top ?
+          loaded ? fn() : fns.push(fn) :
+          function () {
+            try {
+              testEl.doScroll('left')
+            } catch (e) {
+              return setTimeout(function() { ready(fn) }, 50)
+            }
+            fn()
+          }()
+      } :
+      function (fn) {
+        loaded ? fn() : fns.push(fn)
+      })
+  })
+
+  provide("domready", module.exports);
+
+  !function ($) {
+    var ready = require('domready')
+    $.ender({domReady: ready})
+    $.ender({
+      ready: function (f) {
+        ready(f)
+        return this
+      }
+    }, true)
+  }(ender);
+
+}());
+
+(function () {
+
+  var module = { exports: {} }, exports = module.exports;
+
+  /*!
+    * @preserve Qwery - A Blazing Fast query selector engine
+    * https://github.com/ded/qwery
+    * copyright Dustin Diaz 2012
+    * MIT License
+    */
+  
+  (function (name, context, definition) {
+    if (typeof module != 'undefined' && module.exports) module.exports = definition()
+    else if (typeof define == 'function' && define.amd) define(definition)
+    else context[name] = definition()
+  })('qwery', this, function () {
+    var doc = document
+      , html = doc.documentElement
+      , byClass = 'getElementsByClassName'
+      , byTag = 'getElementsByTagName'
+      , qSA = 'querySelectorAll'
+      , useNativeQSA = 'useNativeQSA'
+      , tagName = 'tagName'
+      , nodeType = 'nodeType'
+      , select // main select() method, assign later
+  
+      , id = /#([\w\-]+)/
+      , clas = /\.[\w\-]+/g
+      , idOnly = /^#([\w\-]+)$/
+      , classOnly = /^\.([\w\-]+)$/
+      , tagOnly = /^([\w\-]+)$/
+      , tagAndOrClass = /^([\w]+)?\.([\w\-]+)$/
+      , splittable = /(^|,)\s*[>~+]/
+      , normalizr = /^\s+|\s*([,\s\+\~>]|$)\s*/g
+      , splitters = /[\s\>\+\~]/
+      , splittersMore = /(?![\s\w\-\/\?\&\=\:\.\(\)\!,@#%<>\{\}\$\*\^'"]*\]|[\s\w\+\-]*\))/
+      , specialChars = /([.*+?\^=!:${}()|\[\]\/\\])/g
+      , simple = /^(\*|[a-z0-9]+)?(?:([\.\#]+[\w\-\.#]+)?)/
+      , attr = /\[([\w\-]+)(?:([\|\^\$\*\~]?\=)['"]?([ \w\-\/\?\&\=\:\.\(\)\!,@#%<>\{\}\$\*\^]+)["']?)?\]/
+      , pseudo = /:([\w\-]+)(\(['"]?([^()]+)['"]?\))?/
+      , easy = new RegExp(idOnly.source + '|' + tagOnly.source + '|' + classOnly.source)
+      , dividers = new RegExp('(' + splitters.source + ')' + splittersMore.source, 'g')
+      , tokenizr = new RegExp(splitters.source + splittersMore.source)
+      , chunker = new RegExp(simple.source + '(' + attr.source + ')?' + '(' + pseudo.source + ')?')
+  
+    var walker = {
+        ' ': function (node) {
+          return node && node !== html && node.parentNode
+        }
+      , '>': function (node, contestant) {
+          return node && node.parentNode == contestant.parentNode && node.parentNode
+        }
+      , '~': function (node) {
+          return node && node.previousSibling
+        }
+      , '+': function (node, contestant, p1, p2) {
+          if (!node) return false
+          return (p1 = previous(node)) && (p2 = previous(contestant)) && p1 == p2 && p1
+        }
+      }
+  
+    function cache() {
+      this.c = {}
+    }
+    cache.prototype = {
+      g: function (k) {
+        return this.c[k] || undefined
+      }
+    , s: function (k, v, r) {
+        v = r ? new RegExp(v) : v
+        return (this.c[k] = v)
+      }
+    }
+  
+    var classCache = new cache()
+      , cleanCache = new cache()
+      , attrCache = new cache()
+      , tokenCache = new cache()
+  
+    function classRegex(c) {
+      return classCache.g(c) || classCache.s(c, '(^|\\s+)' + c + '(\\s+|$)', 1)
+    }
+  
+    // not quite as fast as inline loops in older browsers so don't use liberally
+    function each(a, fn) {
+      var i = 0, l = a.length
+      for (; i < l; i++) fn(a[i])
+    }
+  
+    function flatten(ar) {
+      for (var r = [], i = 0, l = ar.length; i < l; ++i) arrayLike(ar[i]) ? (r = r.concat(ar[i])) : (r[r.length] = ar[i])
+      return r
+    }
+  
+    function arrayify(ar) {
+      var i = 0, l = ar.length, r = []
+      for (; i < l; i++) r[i] = ar[i]
+      return r
+    }
+  
+    function previous(n) {
+      while (n = n.previousSibling) if (n[nodeType] == 1) break;
+      return n
+    }
+  
+    function q(query) {
+      return query.match(chunker)
+    }
+  
+    // called using `this` as element and arguments from regex group results.
+    // given => div.hello[title="world"]:foo('bar')
+    // div.hello[title="world"]:foo('bar'), div, .hello, [title="world"], title, =, world, :foo('bar'), foo, ('bar'), bar]
+    function interpret(whole, tag, idsAndClasses, wholeAttribute, attribute, qualifier, value, wholePseudo, pseudo, wholePseudoVal, pseudoVal) {
+      var i, m, k, o, classes
+      if (this[nodeType] !== 1) return false
+      if (tag && tag !== '*' && this[tagName] && this[tagName].toLowerCase() !== tag) return false
+      if (idsAndClasses && (m = idsAndClasses.match(id)) && m[1] !== this.id) return false
+      if (idsAndClasses && (classes = idsAndClasses.match(clas))) {
+        for (i = classes.length; i--;) if (!classRegex(classes[i].slice(1)).test(this.className)) return false
+      }
+      if (pseudo && qwery.pseudos[pseudo] && !qwery.pseudos[pseudo](this, pseudoVal)) return false
+      if (wholeAttribute && !value) { // select is just for existance of attrib
+        o = this.attributes
+        for (k in o) {
+          if (Object.prototype.hasOwnProperty.call(o, k) && (o[k].name || k) == attribute) {
+            return this
+          }
+        }
+      }
+      if (wholeAttribute && !checkAttr(qualifier, getAttr(this, attribute) || '', value)) {
+        // select is for attrib equality
+        return false
+      }
+      return this
+    }
+  
+    function clean(s) {
+      return cleanCache.g(s) || cleanCache.s(s, s.replace(specialChars, '\\$1'))
+    }
+  
+    function checkAttr(qualify, actual, val) {
+      switch (qualify) {
+      case '=':
+        return actual == val
+      case '^=':
+        return actual.match(attrCache.g('^=' + val) || attrCache.s('^=' + val, '^' + clean(val), 1))
+      case '$=':
+        return actual.match(attrCache.g('$=' + val) || attrCache.s('$=' + val, clean(val) + '$', 1))
+      case '*=':
+        return actual.match(attrCache.g(val) || attrCache.s(val, clean(val), 1))
+      case '~=':
+        return actual.match(attrCache.g('~=' + val) || attrCache.s('~=' + val, '(?:^|\\s+)' + clean(val) + '(?:\\s+|$)', 1))
+      case '|=':
+        return actual.match(attrCache.g('|=' + val) || attrCache.s('|=' + val, '^' + clean(val) + '(-|$)', 1))
+      }
+      return 0
+    }
+  
+    // given a selector, first check for simple cases then collect all base candidate matches and filter
+    function _qwery(selector, _root) {
+      var r = [], ret = [], i, l, m, token, tag, els, intr, item, root = _root
+        , tokens = tokenCache.g(selector) || tokenCache.s(selector, selector.split(tokenizr))
+        , dividedTokens = selector.match(dividers)
+  
+      if (!tokens.length) return r
+  
+      token = (tokens = tokens.slice(0)).pop() // copy cached tokens, take the last one
+      if (tokens.length && (m = tokens[tokens.length - 1].match(idOnly))) root = byId(_root, m[1])
+      if (!root) return r
+  
+      intr = q(token)
+      // collect base candidates to filter
+      els = root !== _root && root[nodeType] !== 9 && dividedTokens && /^[+~]$/.test(dividedTokens[dividedTokens.length - 1]) ?
+        function (r) {
+          while (root = root.nextSibling) {
+            root[nodeType] == 1 && (intr[1] ? intr[1] == root[tagName].toLowerCase() : 1) && (r[r.length] = root)
+          }
+          return r
+        }([]) :
+        root[byTag](intr[1] || '*')
+      // filter elements according to the right-most part of the selector
+      for (i = 0, l = els.length; i < l; i++) {
+        if (item = interpret.apply(els[i], intr)) r[r.length] = item
+      }
+      if (!tokens.length) return r
+  
+      // filter further according to the rest of the selector (the left side)
+      each(r, function (e) { if (ancestorMatch(e, tokens, dividedTokens)) ret[ret.length] = e })
+      return ret
+    }
+  
+    // compare element to a selector
+    function is(el, selector, root) {
+      if (isNode(selector)) return el == selector
+      if (arrayLike(selector)) return !!~flatten(selector).indexOf(el) // if selector is an array, is el a member?
+  
+      var selectors = selector.split(','), tokens, dividedTokens
+      while (selector = selectors.pop()) {
+        tokens = tokenCache.g(selector) || tokenCache.s(selector, selector.split(tokenizr))
+        dividedTokens = selector.match(dividers)
+        tokens = tokens.slice(0) // copy array
+        if (interpret.apply(el, q(tokens.pop())) && (!tokens.length || ancestorMatch(el, tokens, dividedTokens, root))) {
+          return true
+        }
+      }
+      return false
+    }
+  
+    // given elements matching the right-most part of a selector, filter out any that don't match the rest
+    function ancestorMatch(el, tokens, dividedTokens, root) {
+      var cand
+      // recursively work backwards through the tokens and up the dom, covering all options
+      function crawl(e, i, p) {
+        while (p = walker[dividedTokens[i]](p, e)) {
+          if (isNode(p) && (interpret.apply(p, q(tokens[i])))) {
+            if (i) {
+              if (cand = crawl(p, i - 1, p)) return cand
+            } else return p
+          }
+        }
+      }
+      return (cand = crawl(el, tokens.length - 1, el)) && (!root || isAncestor(cand, root))
+    }
+  
+    function isNode(el, t) {
+      return el && typeof el === 'object' && (t = el[nodeType]) && (t == 1 || t == 9)
+    }
+  
+    function uniq(ar) {
+      var a = [], i, j;
+      o:
+      for (i = 0; i < ar.length; ++i) {
+        for (j = 0; j < a.length; ++j) if (a[j] == ar[i]) continue o
+        a[a.length] = ar[i]
+      }
+      return a
+    }
+  
+    function arrayLike(o) {
+      return (typeof o === 'object' && isFinite(o.length))
+    }
+  
+    function normalizeRoot(root) {
+      if (!root) return doc
+      if (typeof root == 'string') return qwery(root)[0]
+      if (!root[nodeType] && arrayLike(root)) return root[0]
+      return root
+    }
+  
+    function byId(root, id, el) {
+      // if doc, query on it, else query the parent doc or if a detached fragment rewrite the query and run on the fragment
+      return root[nodeType] === 9 ? root.getElementById(id) :
+        root.ownerDocument &&
+          (((el = root.ownerDocument.getElementById(id)) && isAncestor(el, root) && el) ||
+            (!isAncestor(root, root.ownerDocument) && select('[id="' + id + '"]', root)[0]))
+    }
+  
+    function qwery(selector, _root) {
+      var m, el, root = normalizeRoot(_root)
+  
+      // easy, fast cases that we can dispatch with simple DOM calls
+      if (!root || !selector) return []
+      if (selector === window || isNode(selector)) {
+        return !_root || (selector !== window && isNode(root) && isAncestor(selector, root)) ? [selector] : []
+      }
+      if (selector && arrayLike(selector)) return flatten(selector)
+      if (m = selector.match(easy)) {
+        if (m[1]) return (el = byId(root, m[1])) ? [el] : []
+        if (m[2]) return arrayify(root[byTag](m[2]))
+        if (hasByClass && m[3]) return arrayify(root[byClass](m[3]))
+      }
+  
+      return select(selector, root)
+    }
+  
+    // where the root is not document and a relationship selector is first we have to
+    // do some awkward adjustments to get it to work, even with qSA
+    function collectSelector(root, collector) {
+      return function (s) {
+        var oid, nid
+        if (splittable.test(s)) {
+          if (root[nodeType] !== 9) {
+            // make sure the el has an id, rewrite the query, set root to doc and run it
+            if (!(nid = oid = root.getAttribute('id'))) root.setAttribute('id', nid = '__qwerymeupscotty')
+            s = '[id="' + nid + '"]' + s // avoid byId and allow us to match context element
+            collector(root.parentNode || root, s, true)
+            oid || root.removeAttribute('id')
+          }
+          return;
+        }
+        s.length && collector(root, s, false)
+      }
+    }
+  
+    var isAncestor = 'compareDocumentPosition' in html ?
+      function (element, container) {
+        return (container.compareDocumentPosition(element) & 16) == 16
+      } : 'contains' in html ?
+      function (element, container) {
+        container = container[nodeType] === 9 || container == window ? html : container
+        return container !== element && container.contains(element)
+      } :
+      function (element, container) {
+        while (element = element.parentNode) if (element === container) return 1
+        return 0
+      }
+    , getAttr = function () {
+        // detect buggy IE src/href getAttribute() call
+        var e = doc.createElement('p')
+        return ((e.innerHTML = '<a href="#x">x</a>') && e.firstChild.getAttribute('href') != '#x') ?
+          function (e, a) {
+            return a === 'class' ? e.className : (a === 'href' || a === 'src') ?
+              e.getAttribute(a, 2) : e.getAttribute(a)
+          } :
+          function (e, a) { return e.getAttribute(a) }
+      }()
+    , hasByClass = !!doc[byClass]
+      // has native qSA support
+    , hasQSA = doc.querySelector && doc[qSA]
+      // use native qSA
+    , selectQSA = function (selector, root) {
+        var result = [], ss, e
+        try {
+          if (root[nodeType] === 9 || !splittable.test(selector)) {
+            // most work is done right here, defer to qSA
+            return arrayify(root[qSA](selector))
+          }
+          // special case where we need the services of `collectSelector()`
+          each(ss = selector.split(','), collectSelector(root, function (ctx, s) {
+            e = ctx[qSA](s)
+            if (e.length == 1) result[result.length] = e.item(0)
+            else if (e.length) result = result.concat(arrayify(e))
+          }))
+          return ss.length > 1 && result.length > 1 ? uniq(result) : result
+        } catch (ex) { }
+        return selectNonNative(selector, root)
+      }
+      // no native selector support
+    , selectNonNative = function (selector, root) {
+        var result = [], items, m, i, l, r, ss
+        selector = selector.replace(normalizr, '$1')
+        if (m = selector.match(tagAndOrClass)) {
+          r = classRegex(m[2])
+          items = root[byTag](m[1] || '*')
+          for (i = 0, l = items.length; i < l; i++) {
+            if (r.test(items[i].className)) result[result.length] = items[i]
+          }
+          return result
+        }
+        // more complex selector, get `_qwery()` to do the work for us
+        each(ss = selector.split(','), collectSelector(root, function (ctx, s, rewrite) {
+          r = _qwery(s, ctx)
+          for (i = 0, l = r.length; i < l; i++) {
+            if (ctx[nodeType] === 9 || rewrite || isAncestor(r[i], root)) result[result.length] = r[i]
+          }
+        }))
+        return ss.length > 1 && result.length > 1 ? uniq(result) : result
+      }
+    , configure = function (options) {
+        // configNativeQSA: use fully-internal selector or native qSA where present
+        if (typeof options[useNativeQSA] !== 'undefined')
+          select = !options[useNativeQSA] ? selectNonNative : hasQSA ? selectQSA : selectNonNative
+      }
+  
+    configure({ useNativeQSA: true })
+  
+    qwery.configure = configure
+    qwery.uniq = uniq
+    qwery.is = is
+    qwery.pseudos = {}
+  
+    return qwery
+  });
+  
+
+  provide("qwery", module.exports);
+
+  (function ($) {
+    var q = function () {
+      var r
+      try {
+        r = require('qwery')
+      } catch (ex) {
+        r = require('qwery-mobile')
+      } finally {
+        return r
+      }
+    }()
+  
+    $.pseudos = q.pseudos
+  
+    $._select = function (s, r) {
+      // detect if sibling module 'bonzo' is available at run-time
+      // rather than load-time since technically it's not a dependency and
+      // can be loaded in any order
+      // hence the lazy function re-definition
+      return ($._select = (function () {
+        var b
+        if (typeof $.create == 'function') return function (s, r) {
+          return /^\s*</.test(s) ? $.create(s, r) : q(s, r)
+        }
+        try {
+          b = require('bonzo')
+          return function (s, r) {
+            return /^\s*</.test(s) ? b.create(s, r) : q(s, r)
+          }
+        } catch (e) { }
+        return q
+      })())(s, r)
+    }
+  
+    $.ender({
+        find: function (s) {
+          var r = [], i, l, j, k, els
+          for (i = 0, l = this.length; i < l; i++) {
+            els = q(s, this[i])
+            for (j = 0, k = els.length; j < k; j++) r.push(els[j])
+          }
+          return $(q.uniq(r))
+        }
+      , and: function (s) {
+          var plus = $(s)
+          for (var i = this.length, j = 0, l = this.length + plus.length; i < l; i++, j++) {
+            this[i] = plus[j]
+          }
+          this.length += plus.length
+          return this
+        }
+      , is: function(s, r) {
+          var i, l
+          for (i = 0, l = this.length; i < l; i++) {
+            if (q.is(this[i], s, r)) {
+              return true
+            }
+          }
+          return false
+        }
+    }, true)
+  }(ender));
+  
 
 }());
 
