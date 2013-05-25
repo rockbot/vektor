@@ -46,7 +46,7 @@
         x : ev.clientX - offset.left,
         y : ev.clientY - offset.top
       };
-      console.log('clicked on: ',pt);
+      // console.log('clicked on: ',pt);
       socket.emit('click', pt);
     }
   };
@@ -59,8 +59,8 @@
   //   moveEE = false;
   // });
 
-  $('.change-angle').click(function () {
-    console.log($(this).data('angle'));
-  });
+  // $('.change-angle').click(function () {
+  //   console.log($(this).data('angle'));
+  // });
 
 }());

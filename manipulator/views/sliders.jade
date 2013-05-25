@@ -10,7 +10,7 @@ block content
   .slider.slider-1
     h3 Slider 1
       span.slider1-val 10
-    input#slider1(type='range', value='10', min='10', max='170')
+    input#slider1(type='range', value='0', min='0', max='170')
   .slider.slider-2
     h3 Slider 2
       span.slider2-val 0
@@ -32,10 +32,10 @@ append scripts
       });
 
       socket.on('setSlide', function (angles) {
-        console.log('angles: ', angles)
+        //- console.log('angles: ', angles)
         var th1 = angles[0] * 180 / Math.PI,
             th2 = angles[1] * 180 / Math.PI;
-        console.log(th1, th2);
+        //- console.log(th1, th2);
         document.getElementById('slider1').value = th1;
         $('.slider1-val').text(th1);
         document.getElementById('slider2').value = th2;

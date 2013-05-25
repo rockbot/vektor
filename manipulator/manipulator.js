@@ -41,11 +41,10 @@ module.exports = function (server) {
   }
 
   io.sockets.on('connection', function (socket) {
-    // var board, array;
-    // board = new five.Board();
+    var board, array;
+    board = new five.Board();
     var deg2rad = Math.PI / 180,
         rad2deg = 180 / Math.PI;
-    // var angles = [Math.PI/2, Math.PI/2, 0];
     var angles = [0 * deg2rad, 0 * deg2rad];
 
     var MIN_TH_1 = 10 * deg2rad,
@@ -55,33 +54,27 @@ module.exports = function (server) {
 
     socket.emit('init', setJoints(angles, ORIGIN)); // forward kinematics
 
-    // socket.on('click', function (pt) {
-    //   joints.push(pt);
-    //   console.log(joints);
-    //   socket.emit('draw', joints);
-    // });
+    board.on("ready", function () {
+      five.Servo({
+        pin: 9
+      // , range: [0, 170]
+      });
 
-    // board.on("ready", function () {
-    //   five.Servo({
-    //     pin: 9
-    //   // , range: [0, 170]
-    //   });
+      five.Servo({
+        pin: 10
+      // , range: [0, 170]
+      });
 
-    //   five.Servo({
-    //     pin: 10
-    //   // , range: [0, 170]
-    //   });
-
-    //   array = new five.Servos();
-    //   this.repl.inject({
-    //       array: array
-    //     });
-    //   array[0].move(0);
-    //   array[1].center();
+      array = new five.Servos();
+      this.repl.inject({
+          array: array
+        });
+      array[0].move(0);
+      array[1].center();
   
       socket.on('slider1', function (val) {
         // console.log('slide1: ', val);
-        // array[0].move(val);
+        array[0].move(val);
         angles[0] = val * deg2rad;
         socket.emit('draw', setJoints(angles));
       });
@@ -89,13 +82,13 @@ module.exports = function (server) {
       socket.on('slider2', function (val) {
 
         // console.log(val, parseInt(val, 10)+90)
-        // array[1].move(parseInt(val, 10) + 90);
+        array[1].move(parseInt(val, 10) + 90);
         angles[1] = val * deg2rad;
         socket.emit('draw', setJoints(angles));
       });
 
       socket.on('click', function (pt) { // inverse kinematics
-        console.log('on click: ', pt)
+        // console.log('on click: ', pt)
         var pt_v = new v(pt);
         var distToEE = pt_v.distanceFrom(endEff);
         
@@ -115,14 +108,14 @@ module.exports = function (server) {
             l2_sq = l2 * l2,
             th1, th2, cth2, sth2;
 
-        console.log('x: ', x, ', y: ', y);
+        // console.log('x: ', x, ', y: ', y);
 
         // ignore any attempts to move the arm outside of its own physical boundaries
         if (Math.sqrt(x_sq + y_sq) > MAX_LENGTH || y < 0) {
           return false; 
         }
 
-        console.log('pt: ', pt, ' ee: ', endEff);
+        // console.log('pt: ', pt, ' ee: ', endEff);
 
         // values of th2 & th1 from http://www.cescg.org/CESCG-2002/LBarinka/paper.pdf
         th2 = angles[1] = Math.acos( (x_sq + y_sq - l1_sq - l2_sq) / (2 * l1 * l2) );
@@ -130,7 +123,7 @@ module.exports = function (server) {
         cth2 = Math.cos(th2);
         sth2 = Math.sin(th2);
 
-        console.log('th2: ', th2, ' cth2: ', cth2, ' sth2: ', sth2)
+        // console.log('th2: ', th2, ' cth2: ', cth2, ' sth2: ', sth2)
 
         th1 = angles[0] = Math.asin((y * (l1 + l2 * cth2) - x * l2 * sth2) / (x_sq + y_sq));
 
@@ -138,15 +131,15 @@ module.exports = function (server) {
         //   th1 = Math.PI - th1;
         // th1 = angles[0] = (-(l2 * sth2) * x + (l1 + l2 * cth2) * y) / ( (l2 * sth2) * y + (l1 + l2 * cth2) * x );
 
-        console.log('th1: ', th1 * rad2deg, ', th2: ', th2 * rad2deg)
+        // console.log('th1: ', th1 * rad2deg, ', th2: ', th2 * rad2deg)
         // console.log('after angles: ', angles)
         socket.emit('setSlide', angles);
 
         socket.emit('draw', setJoints(angles))
-        // array[0].move(angles[0] * rad2deg);
-        // array[1].move(angles[1] * rad2deg + 90);
+        array[0].move(angles[0] * rad2deg);
+        array[1].move(angles[1] * rad2deg + 90);
       });
-    // });
+    });
 
   });
 };
