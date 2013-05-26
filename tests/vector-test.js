@@ -37,7 +37,8 @@ var b = new v(1,1,0);
 describe('Between two vectors: ', function () {
   it('should add two vectors easily', function (done) {
     var c = a.add(b);
-    c.should.eql([2,1,0]);
+    c.v.length.should.eql(3);
+    c.v.should.eql([ 2, 1, 0 ]);
     done();
   });
 
