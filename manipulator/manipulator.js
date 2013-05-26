@@ -45,7 +45,7 @@ module.exports = function (server) {
     board = new five.Board();
     var deg2rad = Math.PI / 180,
         rad2deg = 180 / Math.PI;
-    var angles = [0 * deg2rad, 0 * deg2rad];
+    var angles = [10 * deg2rad, 0 * deg2rad];
 
     var MIN_TH_1 = 10 * deg2rad,
         MAX_TH_1 = 170 * deg2rad,
@@ -57,12 +57,12 @@ module.exports = function (server) {
     board.on("ready", function () {
       five.Servo({
         pin: 9
-      // , range: [0, 170]
+      , range: [10, 170]
       });
 
       five.Servo({
         pin: 10
-      // , range: [0, 170]
+      , range: [10, 170]
       });
 
       array = new five.Servos();
