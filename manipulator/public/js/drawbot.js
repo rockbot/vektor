@@ -1,7 +1,7 @@
-var canvas = document.getElementById("robot")
-  , ctx = canvas.getContext("2d")
-  , socket = io.connect('http://localhost')
-  , moveEE = false;
+var canvas = document.getElementById("robot"),
+    ctx = canvas.getContext("2d"),
+    socket = io.connect('http://localhost'),
+    moveEE = false;
 
 socket.on('init', function (joints) {
   $('#ee-val').text(" ( " + joints[2].x.toFixed(2) + " , " + joints[2].y.toFixed(2) + " )")

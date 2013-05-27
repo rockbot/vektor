@@ -3,13 +3,13 @@
  * Module dependencies.
  */
 
-var express = require('express')
-  , http = require('http')
-  , path = require('path');
+var express = require('express'),
+    http = require('http'),
+    path = require('path');
 
-var app = express()
-  , server = http.createServer(app)
-  , manipulator = require('./manipulator')(server);
+var app = express(),
+    server = http.createServer(app),
+    manipulator = require('./manipulator')(server);
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
