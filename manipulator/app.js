@@ -4,7 +4,6 @@
  */
 
 var express = require('express')
-  , controllers = require('./controllers')
   , http = require('http')
   , path = require('path');
 
@@ -29,7 +28,9 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-app.get('/', controllers.index);
+app.get('/', function(req, res){
+  res.render('sliders');
+});
 
 server.listen(3000);
 

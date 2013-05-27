@@ -1,64 +1,24 @@
-extends layout
+doctype 5
+html
+  head
+    title Articulated Robot
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    canvas(id="robot", width="500", height="300")
 
-block content
-  canvas(id="robot", width="500", height="300")
+    .ee
+      span End Effector Postion:
+      span#ee-val
 
-  input#ee-x(name='ee-x')
-  input#ee-y(name='ee-y')
-  span#ee-val
+    .slider.slider-1
+      h3 Joint 1:
+        span.slider1-val 10
+      input#slider1(type='range', value='10', min='10', max='170')
+    .slider.slider-2
+      h3 Joint 2:
+        span.slider2-val 0
+      input#slider2(type='range', value='0', min='-80', max='80')
 
-  .slider.slider-1
-    h3 Slider 1
-      span.slider1-val 10
-    input#slider1(type='range', value='10', min='10', max='170')
-  .slider.slider-2
-    h3 Slider 2
-      span.slider2-val 0
-    input#slider2(type='range', value='0', min='-80', max='80')
-
-append scripts
-  script
-    (function () {
-      var socket = io.connect('http://localhost');
-      socket.on('init', function (joints) {
-        $('#ee-val').text(" ( " + joints[2].x + " , " + joints[2].y + " )")
-        document.getElementById('ee-x').value = joints[2].x;
-        document.getElementById('ee-y').value = joints[2].y;
-      })
-
-      socket.on('draw', function (joints) {
-        $('#ee-val').text(" ( " + joints[2].x + " , " + joints[2].y + " )")
-      });
-
-      socket.on('setSlide', function (angles) {
-        //- console.log('angles: ', angles)
-        var th1 = angles[0] * 180 / Math.PI,
-            th2 = angles[1] * 180 / Math.PI;
-        //- console.log(th1, th2);
-        document.getElementById('slider1').value = th1;
-        $('.slider1-val').text(th1);
-        document.getElementById('slider2').value = th2;
-        $('.slider2-val').text(th2);
-      });
-
-      $.domReady(function () {
-        $('#slider1').change(function () {
-          var value = $(this).val();
-          socket.emit('slider1', value);
-          $('.slider1-val').html(value);
-        });
-        $('#slider2').change(function () {
-          var value = $(this).val();
-          socket.emit('slider2', value);
-          $('.slider2-val').html(value);
-        });
-        $('#ee-x, #ee-y').keyup(function () {
-          var pt = {
-            x: $('#ee-x').val(),
-            y: $('#ee-y').val()
-          };
-          socket.emit('ee-val', pt);
-        });
-      });      
-
-    })();
+    script(src="/socket.io/socket.io.js")
+    script(src="/js/ender.min.js")
+    script(src="/js/drawbot.js")
