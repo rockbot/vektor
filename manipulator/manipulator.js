@@ -45,36 +45,36 @@ module.exports = function (server) {
     socket.emit('init', setJoints(angles, ORIGIN)); // forward kinematics
 
     // set up the board and servos
-    // var board, array;
-    // board = new five.Board();
-    // board.on("ready", function () {
-    //   five.Servo({
-    //     pin: 9
-    //   , range: [10, 170]
-    //   });
+    var board, array;
+    board = new five.Board();
+    board.on("ready", function () {
+      five.Servo({
+        pin: 9
+      , range: [10, 170]
+      });
 
-    //   five.Servo({
-    //     pin: 10
-    //   , range: [10, 170]
-    //   });
+      five.Servo({
+        pin: 10
+      , range: [10, 170]
+      });
 
-    //   array = new five.Servos();
-    //   this.repl.inject({
-    //       array: array
-    //     });
-    //   array[0].move(0);
-    //   array[1].center();
+      array = new five.Servos();
+      this.repl.inject({
+          array: array
+        });
+      array[0].move(0);
+      array[1].center();
   
       socket.on('slider1', function (val) {
         // console.log('slide1: ', val);
-        // array[0].move(val);
+        array[0].move(val);
         angles[0] = val * deg2rad;
         socket.emit('draw', setJoints(angles)); // forward kinematics
       });
 
       socket.on('slider2', function (val) {
         // console.log(val, parseInt(val, 10)+90)
-        // array[1].move(parseInt(val, 10) + 90);
+        array[1].move(parseInt(val, 10) + 90);
         angles[1] = val * deg2rad;
         socket.emit('draw', setJoints(angles)); // forward kinematics
       });
@@ -110,9 +110,9 @@ module.exports = function (server) {
         socket.emit('setSlide', angles);
 
         socket.emit('draw', setJoints(angles))
-      //   array[0].move(angles[0] * rad2deg);
-      //   array[1].move(angles[1] * rad2deg + 90);
-      // });
+        array[0].move(angles[0] * rad2deg);
+        array[1].move(angles[1] * rad2deg + 90);
+      });
     });
 
   });

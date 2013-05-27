@@ -26,12 +26,12 @@ $.domReady(function () {
   $('#slider1').change(function () {
     var value = $(this).val();
     socket.emit('slider1', value);
-    $('.slider1-val').html(parseInt(value));
+    $('.slider1-val').html(value);
   });
   $('#slider2').change(function () {
     var value = $(this).val();
     socket.emit('slider2', value);
-    $('.slider2-val').html(parseInt(value));
+    $('.slider2-val').html(value);
   });
 });      
 
