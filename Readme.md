@@ -1,26 +1,31 @@
-# vektor
-
+vektor
+---
 A robotics-focused linear algebra module
 
-## Install
+#### About
+This code was officially presented at JSConf US 2013. There are slides from the talk here: [AI.js: Robots with Brains](https://t.co/6A5cu2JF58)
+
+#### Install
 `npm install vektor`
 
-## Vectors
+#### Vectors
 * add 
 * dot 
 * distance between two vectors
 
-## Matrices
+#### Matrices
 * set
 * get
 * add
 * dot (multiply)
 * transpose
 
-## Homogenous Matrices (aka Transforms)
+#### Homogenous Matrices (aka Transforms)
 * Rotations
 * Translations
 
-## Coming Soon
-* Examples
+#### Examples
+* Manipulator
+
+#### Coming Soon
 * Tutorials :-)
