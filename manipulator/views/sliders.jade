@@ -1,0 +1,26 @@
+doctype 5
+html
+  head
+    title Manny the Manipulator
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    canvas(id="robot", width="500", height="300")
+
+    .ee
+      span End Effector Position:
+      span#ee-val
+
+    .slider.slider-1
+      h3 Joint 1:
+        span.slider1-val 10
+        | &nbsp;&deg;
+      input#slider1(type='range', value='10', min='10', max='170')
+    .slider.slider-2
+      h3 Joint 2:
+        span.slider2-val 0
+        | &nbsp;&deg;
+      input#slider2(type='range', value='0', min='-80', max='80')
+
+    script(src="/socket.io/socket.io.js")
+    script(src="/js/ender.min.js")
+    script(src="/js/drawbot.js")
