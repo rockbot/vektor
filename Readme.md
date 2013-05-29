@@ -29,3 +29,12 @@ This code was officially presented at JSConf US 2013. There are slides from the 
 
 #### Coming Soon
 * Tutorials :-)
+
+#### Contributions
+_Please, please, please help make this module more robust!_
+
+* Send in pull requests (make sure the tests pass)
+* Discuss additional features in the Issues section
+* Add your name and Github handle here:
+    * Rick Waldron - [rwldrn](https://github.com/rwldrn)
+    * Forbes Lindsay - [ForbesLindesay](https://github.com/ForbesLindesay) 
