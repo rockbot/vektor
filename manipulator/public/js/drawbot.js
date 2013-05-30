@@ -1,6 +1,6 @@
 var canvas = document.getElementById("robot"),
     ctx = canvas.getContext("2d"),
-    socket = io.connect('http://localhost'),
+    socket = io.connect('http://' + window.location.hostname),
     moveEE = false;
 
 socket.on('init', function (joints) {
