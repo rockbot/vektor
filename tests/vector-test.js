@@ -66,5 +66,32 @@ describe('Between two vectors: ', function () {
     lenA.should.eql(1);
     lenB.should.eql(Math.sqrt(2));
     done();
-  })
+  });
+
+  describe('2d vectors', function(){
+    var c = new v(1,0);
+    var d = new v(0,1);
+
+    it('should add two vectors easily', function(done){
+      var sum = c.add(d);
+      (sum.v).should.eql([1,1]);
+      done();
+    });
+
+    it('should calculate the dot product', function(done){
+      (c.dot(d)).should.eql(0);
+      done();
+    });
+
+    it('should calculate the distance between the two', function (done) {
+      var distance = c.distanceFrom(d);
+      distance.should.eql(Math.sqrt(2));
+      done();
+    });
+
+    it('should calculate the length of the vector', function (done) {
+      (c.length()).should.eql(1);
+      done();
+    });
+  });
 });
