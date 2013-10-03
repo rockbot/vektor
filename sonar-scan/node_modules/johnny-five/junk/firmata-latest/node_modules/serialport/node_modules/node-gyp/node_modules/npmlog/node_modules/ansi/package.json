@@ -1,0 +1,22 @@
+{ "name": "ansi"
+, "description": "Advanced ANSI formatting tool for Node.js"
+, "keywords": [ "ansi", "formatting", "cursor", "color", "terminal", "rgb", "256", "stream" ]
+, "version": "0.1.2"
+, "author": "Nathan Rajlich <nathan@tootallnate.net> (http://tootallnate.net)"
+, "repository": { "type": "git", "url": "git://github.com/TooTallNate/ansi.js.git" }
+, "main": "./lib/ansi.js"
+, "bin": {
+      "beep": "./examples/beep/index.js"
+    , "clear": "./examples/clear/index.js"
+    , "imgcat": "./examples/imgcat/index.js"
+    , "starwars": "./examples/starwars.js"
+  }
+, "scripts": {
+      "test": "mocha --reporter spec"
+  }
+, "devDependencies": {
+      "mocha": "*"
+    , "canvas": "*"
+  }
+, "engines": { "node": "*" }
+}
