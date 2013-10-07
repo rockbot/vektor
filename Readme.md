@@ -6,7 +6,7 @@ A robotics-focused linear algebra module
 This code was officially presented at JSConf US 2013. There are slides from the talk here: [AI.js: Robots with Brains](https://t.co/6A5cu2JF58)
 
 #### BatBot
-You may have seen [BatBot](https://github.com/rockbot/vektor/tree/sonar-scan)'s grand debut at LxJS 2013 - slides from the talk are here: [NodeBots: Sight with Sound](https://speakerdeck.com/rockbot/nodebots-sight-with-sound)
+You may have seen [BatBot](https://github.com/rockbot/vektor/tree/master/sonar-scan)'s grand debut at LxJS 2013 - slides from the talk are here: [NodeBots: Sight with Sound](https://speakerdeck.com/rockbot/nodebots-sight-with-sound)
 
 #### Install
 `npm install vektor`
