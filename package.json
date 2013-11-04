@@ -2,7 +2,7 @@
   "author": "Raquel Velez <hiya@raquelvelez.com> (http://raquelvelez.com)",
   "name": "vektor",
   "description": "A linear algebra module, including vectors, matrices, transformations, etc",
-  "keywords": "vector, matrix, transformation",
+  "keywords": ["vector", "matrix", "transformation"],
   "version": "0.0.2",
   "main":"./index.js",
   "scripts": {
