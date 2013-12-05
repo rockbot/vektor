@@ -4,8 +4,11 @@ html
     title Na na na na na na na na BATBOT!
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    canvas(id="scan", width="500", height="500")
+    button.fwd ^
+    button.left <
+    button.right >
+    button.back v
 
     script(src="/socket.io/socket.io.js")
     script(src="/js/ender.min.js")
-    script(src="/js/drawscan.js")
+    script(src="/js/batbot.js")

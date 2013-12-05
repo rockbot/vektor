@@ -1,16 +1,14 @@
 {
-  "name": "vektor-sonar-scan",
-  "version": "0.1.5",
+  "name": "sonar-scanner",
+  "version": "0.2.1",
   "private": true,
   "scripts": {
     "start": "node app"
   },
   "dependencies": {
-    "express": "3.3.4",
-    "jade": "0.34.1",
-    "stylus": "0.36.1",
-    "underscore": "1.5.2",
-    "johnny-five": "0.7.3",
-    "socket.io": "0.9.16"
+    "johnny-five": "0.7.4",
+    "temporal": "0.2.8",
+    "dualshock-controller": "0.2.0",
+    "array-extended": "0.0.9"
   }
 }
