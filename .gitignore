@@ -1,6 +1,7 @@
 *.DS_Store
 /node_modules/
 /manipulator/node_modules/
+/sonar-scan/node_modules/
 /manipulator/public/js/node_modules/*
 /vektor.sublime-project
 /vektor.sublime-workspace
