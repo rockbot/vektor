@@ -80,7 +80,7 @@ function Led( opts ) {
     }
   });
 
-  this.pin = opts && opts.pin || 9;
+  this.pin = typeof opts.pin === "undefined" ? 9 : opts.pin;
   this.pinMode = this.firmata.MODES[
     opts.type && opts.type.toUpperCase() ||
     ( this.board.pins.isPwm(this.pin) ? "PWM" : "OUTPUT" )
@@ -211,7 +211,9 @@ Led.prototype.pulse = function( time ) {
   state.isRunning = true;
 
   this.interval = setInterval(function() {
-    var valueAt = this.value;
+    // Ensure the current value is at least the
+    // number 0 (it may be null or 0)
+    var valueAt = this.value || 0;
 
     // If state.isOn is true, then change
     // the visible state of the LED
