@@ -68,6 +68,13 @@ describe('Creating matrices: ', function () {
       C.get(1,0).should.eql(A.get(0,1));
       done();
     });
+
+    it('should calculate the determinant of the matrix', function (done) {
+      var C = A.det();
+      console.log(C);
+      C.should.eql(-2);
+      done();
+    })
   });
 
   describe('3x3 matrices: ', function () {
@@ -138,5 +145,13 @@ describe('Creating matrices: ', function () {
       C.get(1,0).should.eql(A.get(0,1));
       done();
     });
+
+    it('should calculate the determinant of the matrix', function (done) {
+      var C = A.det();
+      console.log(C);
+      C.should.eql(0);
+      done();
+    })
   });
+
 });
