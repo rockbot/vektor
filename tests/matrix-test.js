@@ -71,10 +71,15 @@ describe('Creating matrices: ', function () {
 
     it('should calculate the determinant of the matrix', function (done) {
       var C = A.det();
-      console.log(C);
       C.should.eql(-2);
       done();
-    })
+    });
+
+    it('should calculate the trace of the matrix', function (done) {
+      var C = A.trace();
+      C.should.eql(5);
+      done();
+    });
   });
 
   describe('3x3 matrices: ', function () {
@@ -151,7 +156,12 @@ describe('Creating matrices: ', function () {
       console.log(C);
       C.should.eql(0);
       done();
-    })
-  });
+    });
 
+    it('should calculate the trace of the matrix', function (done) {
+      var C = A.trace();
+      C.should.eql(15);
+      done();
+    });
+  });
 });
