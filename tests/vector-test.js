@@ -48,11 +48,12 @@ describe('Between two vectors: ', function () {
     done();
   });
 
-  // TODO: Why is this SO SLOW?!
-  // it('should calculate the cross product', function (done) {
-  //   var c = a.cross(b);
-  //   c.should.eql([0,0,1]);
-  // });
+  it('should calculate the cross product', function (done) {
+    var c = a.cross(b);
+    c.v.length.should.eql(3);
+    c.v.should.eql([0,0,1]);
+    done();
+  });
 
   it('should calculate the distance between the two', function (done) {
     var c = a.distanceFrom(b);
