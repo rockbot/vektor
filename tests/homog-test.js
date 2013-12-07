@@ -35,4 +35,10 @@ describe('Create a homogenous matrix', function () {
     H1.getPoint().v.should.eql([1,0,0]);
     done();
   });
+  it('gets the rotation matrix', function (done) {
+    var Rz = new Rotate.RotZ(Math.PI/2);
+    var H1 = new Homog(Rz, new Vector([1, 0, 0]));
+    H1.getRot().should.eql(Rz);
+    done();
+  })
 });
