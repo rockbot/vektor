@@ -40,5 +40,11 @@ describe('Create a homogenous matrix', function () {
     var H1 = new Homog(Rz, new Vector([1, 0, 0]));
     H1.getRot().should.eql(Rz);
     done();
+  });
+  it('should get the angle of rotation', function (done) {
+    var Rz = new Rotate.RotZ(Math.PI/2);
+    var H1 = new Homog(Rz, new Vector([1, 0, 0]));
+    H1.calcAng().should.eql(Math.PI/2);
+    done();
   })
 });
