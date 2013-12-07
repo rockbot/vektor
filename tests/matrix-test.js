@@ -80,6 +80,15 @@ describe('Creating matrices: ', function () {
       C.should.eql(5);
       done();
     });
+
+    it('should scale the matrix by a value', function (done) {
+      var C = A.scale(-1);
+      C.get(0,0).should.eql(-1);
+      C.get(0,1).should.eql(-2);
+      C.get(1,0).should.eql(-3);
+      C.get(1,1).should.eql(-4);
+      done();
+    });
   });
 
   describe('3x3 matrices: ', function () {
@@ -161,6 +170,20 @@ describe('Creating matrices: ', function () {
     it('should calculate the trace of the matrix', function (done) {
       var C = A.trace();
       C.should.eql(15);
+      done();
+    });
+
+    it('should scale the matrix by a value', function (done) {
+      var C = A.scale(-1);
+      C.get(0,0).should.eql(-1);
+      C.get(0,1).should.eql(-2);
+      C.get(0,2).should.eql(-3);
+      C.get(1,0).should.eql(-4);
+      C.get(1,1).should.eql(-5);
+      C.get(1,2).should.eql(-6);
+      C.get(2,0).should.eql(-7);
+      C.get(2,1).should.eql(-8);
+      C.get(2,2).should.eql(-9);
       done();
     });
   });
