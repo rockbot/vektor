@@ -16,50 +16,35 @@ var v = require('vektor').vector;
 
 var a = new v(1, 0, 0);
 // or
-var b = new v({x: 1, y: 0, z: 0});
+var b = new v({x: 1, y: 2, z: 3});
 ````
-Vectors can be initialized with 2 or 3 arguments only.
+
+Note: Vectors can be initialized with 2 or 3 arguments only.
 
 #### add two vectors
 ```` js
-var a = new v(1, 0, 0);
-var b = new v(1, 2, 3);
-
 var c = a.add(b); // [2, 2, 3]
 ````
 
 #### dot product
 ```` js
-var a = new v(1, 0, 0);
-var b = new v(1, 2, 3);
-
 var c = a.dot(b); // 1
 ````
 
 #### cross product
 ```` js
-var a = new v(1, 0, 0);
-var b = new v(1, 2, 3);
-
 var c = a.cross(b); // [0, -3, 2]
 ````
 
 #### distance between two vectors
 ```` js
-var a = new v(1, 0, 0);
-var b = new v(1, 2, 3);
-
 var c = a.distanceFrom(b); // 3.6
 ````
 
 #### length
 ```` js
-var a = new v(1, 2, 3);
-
-var c = a.length(); // 3.74
+var c = b.length(); // 3.74
 ````
-
-
 
 ### Matrices
 * set
