@@ -8,6 +8,9 @@ This code was officially presented at JSConf US 2013. There are slides from the 
 ### Install
 `npm install vektor`
 
+### Running Tests
+`npm test`
+
 ### Vectors
 
 #### initializing a vector
