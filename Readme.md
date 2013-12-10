@@ -109,7 +109,6 @@ var C = A.transpose(); // C = [ [1, 3], [2, 4] ]
 ````
 
 #### calculating the determinant
-Note: only works with 2x2 or 3x3 matrices... for now.
 ```` js
 var c = A.det(); // c = -2
 ````
