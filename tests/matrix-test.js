@@ -13,7 +13,43 @@ describe('Creating matrices: ', function () {
     B.size.should.eql({rows: 2, cols: 2});
     done();
   });
+  it('should have trace === dim if identity', function (done){
+    var C = new Matrix(7,7,true),
+        D = C.trace();
+    D.should.eql(7);
+    done();
+  });
+  it('should have det === 1 if determinant of 4x4 identity', function (done){
+    var C = new Matrix(4,4,true),
+        D = C.det();
+    D.should.eql(1);
+    done();
+  });
+  it('should have det === 72 for this matrix', function (done){
+    var C = new Matrix(4,4,false),
+        D;
 
+    C.set(0,0,1);
+    C.set(0,1,2);
+    C.set(0,2,3);
+    C.set(0,3,4);
+    C.set(1,0,5);
+    C.set(1,1,6);
+    C.set(1,2,7);
+    C.set(1,3,8);
+    C.set(2,0,2);
+    C.set(2,1,6);
+    C.set(2,2,4);
+    C.set(2,3,8);
+    C.set(3,0,3);
+    C.set(3,1,1);
+    C.set(3,2,1);
+    C.set(3,3,2);
+
+    D = C.det();
+    D.should.eql(72);
+    done();
+  });
   describe('2x2 matrices: ', function () {
     var A = new Matrix(2,2);
     var B = new Matrix(2,2);
