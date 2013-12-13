@@ -2,7 +2,7 @@ var Matrix = require('../').matrix;
 var Vector = require('../').vector;
 var should = require('should');
 
-describe.only('Creating matrices: ', function () {
+describe('Creating matrices: ', function () {
   it('should create a Matrix', function () {
     var A = new Matrix(3,4);
     A.size.should.eql({rows: 3, cols: 4});
@@ -82,8 +82,8 @@ describe.only('Creating matrices: ', function () {
   });
 
   describe('3x3 matrices: ', function () {
-    var A = new Matrix(3,3);
-    var B = new Matrix(3,3);
+    var  A = new Matrix(3,3);
+    var  B = new Matrix(3,3);
 
     it('should set a specific value', function () {
       A.set(0,0,1);
@@ -168,16 +168,46 @@ describe.only('Creating matrices: ', function () {
       C.get(2,2).should.eql(-9);
     });
   });
-  describe('generic matrices', function () {
-    describe('determinant', function () {
-      describe('not square matrix', function () {
-        it('should throw exception', function () {
-          (function () {
-            var A = new Matrix(3, 4);
-            A.det();
-          }).should.throw();
-        });
-      });
+  describe('4x4 matrix', function () {
+    it('should calculate det', function () {
+      var A = new Matrix(4, 4);
+      A.setRow(0, [3,4,4,-1]);
+      A.setRow(1, [2,1,5,3]);
+      A.setRow(2, [2,1,3,4]);
+      A.setRow(3, [0,-2,1,3]);
+
+      A.det().should.eql(-23);
+    });
+  });
+  describe('4x4 matrix', function () {
+    it('should calculate det', function () {
+      var A = new Matrix(4, 4);
+      A.setRow(0, [3,4,4,-1]);
+      A.setRow(1, [2,1,5,3]);
+      A.setRow(2, [2,1,3,4]);
+      A.setRow(3, [0,-2,1,3]);
+
+      A.det().should.eql(-23);
+    });
+  });
+  describe('5x5 matrix', function () {
+    it('should calculate det', function () {
+      var A = new Matrix(5, 5);
+      A.setRow(0, [1,2,5,4,3]);
+      A.setRow(1, [2,3,5,5,2]);
+      A.setRow(2, [2,2,5,6,1]);
+      A.setRow(3, [0,-2,1,3,2]);
+      A.setRow(4, [1,2,0,5,4]);
+
+      A.det().should.eql(81);
+    });
+  });
+  describe('not square matrix det', function () {
+    it('should throw exception', function () {
+      (function () {
+        var A = new Matrix(3, 4);
+        A.det();
+      }).should.throw();
     });
   });
 });
