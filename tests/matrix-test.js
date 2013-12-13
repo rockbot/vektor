@@ -2,7 +2,7 @@ var Matrix = require('../').matrix;
 var Vector = require('../').vector;
 var should = require('should');
 
-describe('Creating matrices: ', function () {
+describe.only('Creating matrices: ', function () {
   it('should create a Matrix', function () {
     var A = new Matrix(3,4);
     A.size.should.eql({rows: 3, cols: 4});
@@ -166,6 +166,18 @@ describe('Creating matrices: ', function () {
       C.get(2,0).should.eql(-7);
       C.get(2,1).should.eql(-8);
       C.get(2,2).should.eql(-9);
+    });
+  });
+  describe('generic matrices', function () {
+    describe('determinant', function () {
+      describe('not square matrix', function () {
+        it('should throw exception', function () {
+          (function () {
+            var A = new Matrix(3, 4);
+            A.det();
+          }).should.throw();
+        });
+      });
     });
   });
 });
