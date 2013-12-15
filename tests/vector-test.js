@@ -11,22 +11,22 @@ describe('Creating vectors: ', function () {
 
   it('Should pass with 2 arguments', function (done) {
     var a = new v(1,0);
-    a.v.length.should.eql(2);
-    a.v.should.eql([1,0]);
+    a.v.length.should.eql(3);
+    a.v.should.eql([1,0,0]);
     done();
   });
 
   it('should pass with 1 argument as an object', function (done) {
     var a = new v({x: 1, y: 0});
-    a.v.length.should.eql(2);
-    a.v.should.eql([1,0]);
+    a.v.length.should.eql(3);
+    a.v.should.eql([1,0,0]);
     done();
   });
 
   it('should pass with 1 argument as a vector', function (done) {
     var a = new v([1,0]);
-    a.v.length.should.eql(2);
-    a.v.should.eql([1,0]);
+    a.v.length.should.eql(3);
+    a.v.should.eql([1,0,0]);
     done();
   });
 });

@@ -47,7 +47,7 @@ describe('Creating matrices: ', function () {
     it('should multiply a vector by a matrix', function (done) {
       var v = new Vector(2,3);
       var C = A.dot(v);
-      C.v.should.eql([8,18]);
+      C.v.should.eql([8,18,0]);
       done();
     });
 
