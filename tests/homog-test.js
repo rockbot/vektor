@@ -23,7 +23,7 @@ describe('Create a homogenous matrix', function () {
     var H2 = new Homog(Ry, 0);
     var H3 = new Homog(0, new Vector(1, 0, 0));
     var H2_1 = H3.dot(H2.dot(H1));
-    var s2_2 = parseFloat((Math.sqrt(2) / 2).toFixed(6));
+    var s2_2 = parseFloat((Math.sqrt(2) / 2).toFixed(12));
     H2_1.m.should.eql([[0, -s2_2, s2_2, 1], [1, 0, 0, 0], [0, s2_2, s2_2, 0], [0, 0, 0, 1]]);
   });
   it('get the location of the transformed point', function () {
