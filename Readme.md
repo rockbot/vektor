@@ -138,5 +138,7 @@ _Please, please, please help make this module more robust!_
 * Send in pull requests (make sure the tests pass)
 * Discuss additional features in the Issues section
 * Add your name and Github handle here:
-    * Rick Waldron - [rwldrn](https://github.com/rwldrn)
+    * Rick Waldron - [rwaldron](https://github.com/rwaldron)
     * Forbes Lindsay - [ForbesLindesay](https://github.com/ForbesLindesay)
+    * Alexander Beletsky - [alexanderbeletsky](https://github.com/alexanderbeletsky)
+    * Bill Mills - [BillMills](https://github.com/BillMills)
