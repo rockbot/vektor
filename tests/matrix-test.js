@@ -11,7 +11,12 @@ describe('Creating matrices: ', function () {
     var B = new Matrix(2);
     B.size.should.eql({rows: 2, cols: 2});
   });
-
+  it('should have trace === dim if identity', function (done){
+    var C = new Matrix(7,7,true),
+        D = C.trace();
+    D.should.eql(7);
+    done();
+  });
   describe('2x2 matrices: ', function () {
     var A = new Matrix(2,2);
     var B = new Matrix(2,2);
