@@ -11,7 +11,12 @@ describe('Creating matrices: ', function () {
     var B = new Matrix(2);
     B.size.should.eql({rows: 2, cols: 2});
   });
-
+  it('should have trace === dim if identity', function (done){
+    var C = new Matrix(7,7,true),
+        D = C.trace();
+    D.should.eql(7);
+    done();
+  });
   describe('2x2 matrices: ', function () {
     var A = new Matrix(2,2);
     var B = new Matrix(2,2);
@@ -176,18 +181,7 @@ describe('Creating matrices: ', function () {
       A.setRow(2, [2,1,3,4]);
       A.setRow(3, [0,-2,1,3]);
 
-      A.det().should.eql(-23);
-    });
-  });
-  describe('4x4 matrix', function () {
-    it('should calculate det', function () {
-      var A = new Matrix(4, 4);
-      A.setRow(0, [3,4,4,-1]);
-      A.setRow(1, [2,1,5,3]);
-      A.setRow(2, [2,1,3,4]);
-      A.setRow(3, [0,-2,1,3]);
-
-      A.det().should.eql(-23);
+      parseFloat(A.det().toFixed(10)).should.eql(-23);
     });
   });
   describe('5x5 matrix', function () {
@@ -199,7 +193,31 @@ describe('Creating matrices: ', function () {
       A.setRow(3, [0,-2,1,3,2]);
       A.setRow(4, [1,2,0,5,4]);
 
-      A.det().should.eql(81);
+      parseFloat(A.det().toFixed(10)).should.eql(81);
+    });
+  });
+  describe('5x5 matrix', function () {
+    it('should calculate det of sparse matrix', function () {
+      var A = new Matrix(5, 5);
+      A.setRow(0, [0,0,1,0,0]);
+      A.setRow(1, [0,0,0,0,0]);
+      A.setRow(2, [0,0,0,0,0]);
+      A.setRow(3, [0,0,0,0,0]);
+      A.setRow(4, [0,0,0,0,0]);
+
+      parseFloat(A.det().toFixed(10)).should.eql(0);
+    });
+  });
+  describe('determinant validation', function () {
+    it('should get the same determinant via Doolittle or Cofactor calculation', function () {
+      var A = new Matrix(5, 5);
+      A.setRow(0, [Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]);
+      A.setRow(1, [Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]);
+      A.setRow(2, [Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]);
+      A.setRow(3, [Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]);
+      A.setRow(4, [Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]);
+
+      parseFloat(A.det().toFixed(10)).should.eql(A.cofactorDet().toFixed(10));
     });
   });
   describe('not square matrix det', function () {
