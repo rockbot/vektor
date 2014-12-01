@@ -123,8 +123,36 @@ var c = A.trace(); // c = 5
 ````
 
 ### Homogenous Matrices (aka Transforms)
-* Rotations
 * Translations
+
+### Rotations
+
+#### initializing a rotation matrix
+````js
+var r = require('vektor').rotate;
+
+// if the second argument is true, the first argument is in degrees
+var a = new r.RotX(90, true); // matrix for a 90 degree rotation about the x axis
+var b = new r.RotY(180, true); // matrix for a 180 degree rotation about the y axis
+// if the second argument is false or not set, the first argument is in radians
+var c = new r.RotZ(2 * Math.PI); // matrix for a 2 Pi radians (360 degrees) rotation about the z axis
+assert.deepEqual(new r.RotX(0, true), new r.RotX(360, true));
+assert.deepEqual(new r.RotX(0), new r.RotX(2 * Math.PI));
+````
+
+#### rotate a vector around axes
+````js
+var v = require('vektor').vector;
+var vector = new v([1,0,0]); // original vector
+
+// Rotate (1, 0, 0) by 90 degrees on the Z axis and then by 45 degrees on the X axis
+
+var rotationMatrix = new r.RotZ(Math.PI/2); // z-axis rotation matrix for Pi/2 radians (90 degrees)
+vector = rotationMatrix.dot(vector); // multiply rotation matrix by vector to rotate the vector
+rotationMatrix = new r.RotX(45, true); // y-axis rotation matrix for 45 degrees (Pi/4 radians)
+vector = rotationMatrix.dot(vector);
+var coordinates = vector.v // [ -0.707106781187, -0.500000000001, 0.500000000001 ]
+````
 
 ### Examples
 * Manipulator
