@@ -219,6 +219,17 @@ describe('Creating matrices: ', function () {
 
       parseFloat(A.det().toFixed(10)).should.eql(A.cofactorDet().toFixed(10));
     });
+    it('should fail with a non-square matrix', function () {
+      (function () {
+        var A = new Matrix(4, 5);
+        A.setRow(0, [Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]);
+        A.setRow(1, [Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]);
+        A.setRow(2, [Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]);
+        A.setRow(3, [Math.random(), Math.random(), Math.random(), Math.random(), Math.random()]);
+
+        A.cofactorDet().toFixed(10);
+      }).should.throw();
+    });
   });
   describe('not square matrix det', function () {
     it('should throw exception', function () {
@@ -226,6 +237,80 @@ describe('Creating matrices: ', function () {
         var A = new Matrix(3, 4);
         A.det();
       }).should.throw();
+    });
+  });
+  describe('not square matrix trace', function () {
+    it('should return an error', function () {
+      var A = new Matrix(3, 4);
+      var traceRetVal = A.trace();
+      traceRetVal.should.be.an.error;
+    });
+  });
+  describe('unmatched matrices', function () {
+    var A;
+    var B;
+    beforeEach(function () {
+      A = new Matrix(2,2);
+      A.set(0,0,1);
+      A.set(0,1,2);
+      A.set(1,0,3);
+      A.set(1,1,4);
+      B = new Matrix(3,3);
+      B.set(0,0,1);
+      B.set(0,1,2);
+      B.set(0,2,4);
+      B.set(1,0,4);
+      B.set(1,1,7);
+      B.set(1,2,8);
+      B.set(2,0,9);
+      B.set(2,1,4);
+      B.set(2,2,2);
+    });
+    it('should fail to add them', function () {
+      var addRetVal = A.add(B);
+      addRetVal.should.be.an.error;
+    });
+    it('dot should fail', function () {
+      var dotRetVal = A.dot(B);
+      dotRetVal.should.be.an.error;
+    });
+  });
+  describe('an unmatched matrix and vector', function () {
+    var A;
+    var B;
+    beforeEach(function () {
+      A = new Matrix(2,2);
+      A.set(0,0,1);
+      A.set(0,1,2);
+      A.set(1,0,3);
+      A.set(1,1,4);
+      B = new Vector(0,5,9);
+    });
+    it('dot should throw', function () {
+      var dotRetVal = A.dot(B);
+      dotRetVal.should.be.an.error;
+    });
+  });
+  describe('getPoint', function () {
+    it('should fail with a non-homogenous matrix', function () {
+      var A = new Matrix(2,2);
+      A.set(0,0,1);
+      A.set(0,1,2);
+      A.set(1,0,3);
+      A.set(1,1,4);
+      var getPointRetVal = A.getPoint();
+      getPointRetVal.should.be.an.error;
+    });
+  });
+  describe('getRot ', function () {
+    it('should return nothing with a non-homogenous matrix', function () {
+      var A = new Matrix(2,2);
+      A.set(0,0,1);
+      A.set(0,1,2);
+      A.set(1,0,3);
+      A.set(1,1,4);
+      var getPointRetVal = A.getRot();
+      (getPointRetVal === undefined).should.be.true;
     });
   });
 });

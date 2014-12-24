@@ -46,4 +46,14 @@ describe('Create a homogenous matrix', function () {
     var H1 = new Homog(Rz, new Vector([1, 0, 0]));
     H1.calcRotVec().should.eql(new Vector(0, 0, 1));
   });
+  it('should fail with a non-square matrix', function () {
+    var nonSquare = new Matrix(3, 4);
+    var homogRetVal = new Homog(nonSquare, new Vector([1, 0, 0]));
+    homogRetVal.should.be.an.error;
+  });
+  it('should add the buffer zone for 2-D systems', function () {
+    var twoD = new Matrix(2, 2);
+    var H1 = new Homog(twoD, new Vector([2, 3]));
+    H1.m.should.eql([[0, 0, , 2], [0, 0, , 3], [0, 0, 1, 0], [0, 0, 0, 1]]);
+  });
 });
