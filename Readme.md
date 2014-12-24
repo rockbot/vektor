@@ -49,6 +49,11 @@ var c = a.distanceFrom(b); // 3.6
 var c = b.length(); // 3.74
 ````
 
+#### scale
+```` js
+var c = b.scale(2); // [2, 4, 6]
+````
+
 -----
 
 ### Matrices

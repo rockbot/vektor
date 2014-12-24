@@ -30,6 +30,13 @@ describe('Creating vectors: ', function () {
 var a = new v(1,0,0);
 var b = new v(1,1,0);
 
+describe('Vector operations: ', function () {
+  it('should scale the vector', function () {
+    var c = b.scale(1.5);
+    c.v.should.eql([ 1.5, 1.5, 0 ]);
+  });
+});
+
 describe('Between two vectors: ', function () {
   it('should add two vectors easily', function () {
     var c = a.add(b);
