@@ -18,7 +18,9 @@
     "type": "git",
     "url": "git@github.com:rockbot/vektor.git"
   },
-  "dependencies": {},
+  "dependencies": {
+    "benchmark": "^1.0.0"
+  },
   "devDependencies": {
     "should": "2.1.1",
     "mocha": "1.15.1",
