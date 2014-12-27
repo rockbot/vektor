@@ -17,9 +17,15 @@ describe('Creating matrices: ', function () {
     D.should.eql(7);
     done();
   });
+  it('allows identity matrix iff matrix is square', function (){
+      (function () {
+        var A = new Matrix(7, 3, true);
+      }).should.throw();
+  });
   describe('2x2 matrices: ', function () {
     var A = new Matrix(2,2);
     var B = new Matrix(2,2);
+    var D = new Matrix(2,2);
 
     it('should set a specific value', function () {
       // var A = new Matrix(3,4);
@@ -84,11 +90,29 @@ describe('Creating matrices: ', function () {
       C.get(1,1).should.eql(-4);
 
     });
+    
+    it('scale detects out of bounds access', function () {
+      D.set(0,0,2);
+      D.set(0,1,4);
+      D.set(0,2,Infinity);
+      D.set(1,0,6);
+      D.set(1,1,8);
+      D.set(1,2,Infinity);
+      var C = D.scale(-1);
+      C.get(0,0).should.eql(-2);
+      C.get(0,1).should.eql(-4);
+      C.get(1,0).should.eql(-6);
+      C.get(1,1).should.eql(-8);
+      should.not.exist(C.get(0,2));
+      should.not.exist(C.get(1,2));
+    });
+    
   });
 
   describe('3x3 matrices: ', function () {
     var  A = new Matrix(3,3);
     var  B = new Matrix(3,3);
+    var  D = new Matrix(3,3);
 
     it('should set a specific value', function () {
       A.set(0,0,1);
@@ -153,6 +177,18 @@ describe('Creating matrices: ', function () {
     it('should calculate the determinant of the matrix', function () {
       var C = A.det();
       C.should.eql(0);
+
+      D.set(0,0,0);
+      D.set(0,1,1);
+      D.set(0,2,1);
+      D.set(1,0,1);
+      D.set(1,1,1);
+      D.set(1,2,1);
+      D.set(2,0,1);
+      D.set(2,1,1);
+      D.set(2,2,1);
+      var C = D.det();
+      parseFloat(D.det().toFixed(12)).should.eql(0);      
     });
 
     it('should calculate the trace of the matrix', function () {
@@ -183,6 +219,40 @@ describe('Creating matrices: ', function () {
 
       parseFloat(A.det().toFixed(10)).should.eql(-23);
     });
+    
+    it('detects non-homogenous matrix', function () {
+      (function () {
+        var A = new Matrix(3, 4);
+        A.getPoint();
+      }).should.throw();
+    });
+
+    it('returns the specified point', function () {
+      var A = new Matrix(4, 4);
+      A.setRow(0, [3,4,4,-1]);
+      A.setRow(1, [2,1,5,3]);
+      A.setRow(2, [2,1,3,4]);
+      A.setRow(3, [0,-2,1,3]);
+      A.getPoint().v.should.eql([-1,3,4]);
+    });
+
+    it('calculates the rotation vector for the matrix', function () {
+      var  D = new Matrix(4,4);
+      D.setRow(0, [0.2,1,1,1]);
+      D.setRow(1, [1,0.3,1,1]);
+      D.setRow(2, [1,1,0.1,1]);
+      D.setRow(3, [0,1,1,1]);
+      D.calcRotVec().should.eql(new Vector(0, 0, 0));
+
+      var  D = new Matrix(4,4);
+      D.setRow(0, [-0.03,1,1,1]);
+      D.setRow(1, [-1,-0.2,1,1]);
+      D.setRow(2, [-1,-1,-0.1,1]);
+      D.setRow(3, [0,-1,-1,-1]);
+      D.calcRotVec().should.eql(new Vector(-1.338968862122, 1.338968862122, -1.338968862122));
+
+    });
+
   });
   describe('5x5 matrix', function () {
     it('should calculate det', function () {
