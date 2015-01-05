@@ -6,6 +6,12 @@ var should = require('should');
 var Matrix = require('../').matrix;
 
 describe('Create a homogenous matrix', function () {
+  it('detects bad rotation matrix', function () {
+    var Rz = new Matrix(3, 4);
+    (function () {
+      var H1 = new Homog(Rz, 0);
+    }).should.throw();
+  });
   it('rotating about the z-axis by pi/2 radians', function () {
     var Rz = new Rotate.RotZ(Math.PI/2);
     var H1 = new Homog(Rz, 0);
