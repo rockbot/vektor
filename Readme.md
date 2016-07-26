@@ -160,7 +160,7 @@ var coordinates = vector.v // [ -0.707106781187, -0.500000000001, 0.500000000001
 ````
 
 ### Examples
-* Manipulator
+* [Manny the Manipulator](https://github.com/rockbot/manny)
 
 ### Coming Soon
 * Tutorials :-)
